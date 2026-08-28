@@ -404,7 +404,7 @@ html[dir="ltr"] #learnModalBackdrop .modal-close { right: 0; }
 
     <div class="orline" data-i18n="orText">أو الصق النص مباشرة</div>
 
-    <textarea class="pastebox" id="pasteArea" placeholder='[{"book_title": "...", "main_category": "...", "topic": "...", "headline": "...", "takeaway": "...", "actionable_insight": "..."}]'></textarea>
+    <textarea class="pastebox" id="pasteArea" placeholder='[{"language": "ar", "book_title": "...", "main_category": "...", "topic": "...", "headline": "...", "takeaway": "...", "actionable_insight": "..."}]'></textarea>
 
     <div class="center-actions">
       <button class="btn btn-gold" id="importBtn" data-i18n="importBtn">استيراد البطاقات والتقدم</button>
@@ -528,6 +528,15 @@ html[dir="ltr"] #learnModalBackdrop .modal-close { right: 0; }
     <button class="modal-close" id="cardModalClose">✕</button>
     <h3 id="cardModalTitle" data-i18n="titleAddCard">إضافة بطاقة</h3>
     <div class="sub" data-i18n="subAddCard">املأ الحقول التالية ثم احفظ</div>
+    
+    <div class="field">
+      <label data-i18n="lblCardLang">لغة البطاقة</label>
+      <select id="fLanguage">
+        <option value="ar">العربية (Arabic)</option>
+        <option value="en">English (الإنجليزية)</option>
+      </select>
+    </div>
+    
     <div class="field">
       <label data-i18n="lblBook">الكتاب</label>
       <input type="text" id="fBook" placeholder="اسم الكتاب" data-i18n-ph="phBook">
@@ -685,6 +694,7 @@ const I18N = {
     titleAddCard: "إضافة بطاقة",
     titleEditCard: "تعديل البطاقة",
     subAddCard: "املأ الحقول التالية ثم احفظ",
+    lblCardLang: "لغة البطاقة",
     lblBook: "الكتاب",
     lblCategory: "التصنيف",
     lblTopic: "الموضوع الفرعي",
@@ -703,7 +713,7 @@ const I18N = {
     settingsTitle: "⚙️ الإعدادات",
     settingsSub: "اللغة، التصدير، الاستيراد، وإدارة قاعدة البيانات",
     hdrLang: "🌐 لغة الواجهة (Language)",
-    descLang: "اختر لغة العرض المناسبة لتعلمك",
+    descLang: "اختر لغة العرض المناسبة لتعلمك (وتصفية البطاقات)",
     hdrExport: "📤 تصدير البيانات والتقدم",
     descExport: "نزّل نسخة كاملة من بطاقاتك مع حالة تقدمك كملف JSON لفتحها في جهاز آخر",
     btnDownloadJson: "⬇ تنزيل التقدم والبطاقات كملف JSON",
@@ -736,7 +746,7 @@ const I18N = {
     lblNeverReviewed: "لم تُراجع بعد",
     lblAllCats: "كل التصنيفات",
     lblAllBooks: "كل الكتب",
-    lblNoCardsMatch: "لا توجد بطاقات مطابقة",
+    lblNoCardsMatch: "لا توجد بطاقات مطابقة لهذه اللغة",
     lblDeckCardPos: "البطاقة {pos} من {total} (ضمن الفلتر الحالي)",
     lblFeedShowing: "يعرض {total} بطاقة (تمرير عمودي)",
     lblGridShowing: "يعرض {total} بطاقة (شبكة تفاعلية)",
@@ -806,6 +816,7 @@ const I18N = {
     titleAddCard: "Add Card",
     titleEditCard: "Edit Card",
     subAddCard: "Fill out the fields below and save",
+    lblCardLang: "Card Language",
     lblBook: "Book",
     lblCategory: "Category",
     lblTopic: "Topic",
@@ -824,7 +835,7 @@ const I18N = {
     settingsTitle: "⚙️ Settings",
     settingsSub: "Language, Export, Import, and Database Management",
     hdrLang: "🌐 Display Language",
-    descLang: "Choose your preferred learning language",
+    descLang: "Choose your preferred UI and learning language",
     hdrExport: "📤 Export Data & Progress",
     descExport: "Download your cards with full learning progress as a JSON file to transfer across devices",
     btnDownloadJson: "⬇ Download Progress & Cards as JSON",
@@ -857,7 +868,7 @@ const I18N = {
     lblNeverReviewed: "Never reviewed",
     lblAllCats: "All Categories",
     lblAllBooks: "All Books",
-    lblNoCardsMatch: "No matching cards found",
+    lblNoCardsMatch: "No matching cards found for this language",
     lblDeckCardPos: "Card {pos} of {total} (within current filter)",
     lblFeedShowing: "Showing {total} cards (Vertical Feed)",
     lblGridShowing: "Showing {total} cards (Interactive Grid)",
@@ -934,8 +945,7 @@ function setLanguage(lang) {
   if (db) {
     refreshFilters();
     refreshDbFilters();
-    renderStats();
-    if(el('view-learn').classList.contains('active')) renderLearnStage();
+    if(el('view-learn').classList.contains('active')) applyFilters();
     if(el('view-database').classList.contains('active')) applyDbFilters();
   }
 }
@@ -974,13 +984,14 @@ async function initDb(){
   db.run(`
     CREATE TABLE cards (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
+      language TEXT DEFAULT 'ar',
       book_title TEXT,
       main_category TEXT,
       topic TEXT,
       headline TEXT,
       takeaway TEXT,
       actionable_insight TEXT,
-      UNIQUE(book_title, headline)
+      UNIQUE(language, book_title, headline)
     );
     CREATE TABLE progress (
       card_id INTEGER PRIMARY KEY,
@@ -1036,6 +1047,11 @@ async function tryRestoreFromLocalStorage(){
     for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
     db = new SQL.Database(bytes);
     
+    // Auto-migration for backwards compatibility (adds language column if it doesn't exist)
+    try {
+       dbRun("ALTER TABLE cards ADD COLUMN language TEXT DEFAULT 'ar'");
+    } catch(e) { /* Column likely already exists */ }
+    
     dbRun("UPDATE progress SET status='following' WHERE status='mastered'");
     dbRun("UPDATE progress SET status='trying' WHERE status='review_later'");
     
@@ -1062,7 +1078,12 @@ function validateAndNormalize(json){
           : `Card #${idx+1} is missing required field "${key}".`);
       }
     }
+    
+    let parsedLang = typeof c.language === 'string' ? c.language.toLowerCase() : 'ar';
+    if (!['ar', 'en'].includes(parsedLang)) parsedLang = 'ar';
+    
     return {
+      language: parsedLang,
       book_title: c.book_title.trim(),
       main_category: c.main_category.trim(),
       topic: c.topic.trim(),
@@ -1078,7 +1099,7 @@ function validateAndNormalize(json){
 
 async function importCards(cards){
   if(!db) await initDb();
-  const insertCard = db.prepare(`INSERT OR IGNORE INTO cards (book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?)`);
+  const insertCard = db.prepare(`INSERT OR IGNORE INTO cards (language, book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?,?)`);
   const insertProgress = db.prepare(`INSERT OR REPLACE INTO progress (card_id, status, times_seen, last_reviewed) VALUES (?, ?, ?, ?)`);
   db.run('BEGIN TRANSACTION');
   let addedCount = 0;
@@ -1086,7 +1107,7 @@ async function importCards(cards){
   
   try{
     for(const c of cards){
-      const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [c.book_title, c.headline]);
+      const existing = dbExec(`SELECT id FROM cards WHERE language=? AND book_title=? AND headline=?`, [c.language, c.book_title, c.headline]);
       if(existing.length > 0) {
           duplicateCount++;
           const targetId = existing[0].id;
@@ -1097,7 +1118,7 @@ async function importCards(cards){
           continue; 
       }
 
-      insertCard.run([c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight]);
+      insertCard.run([c.language, c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight]);
       const idRow = dbExec('SELECT last_insert_rowid() as id');
       const newId = idRow[0].id;
       insertProgress.run([newId, c.status || 'new', c.times_seen || 0, c.last_reviewed || null]);
@@ -1171,6 +1192,7 @@ function openCardModal(cardId = null){
   if(cardId){
     const c = getCardById(cardId);
     if(c){
+      el('fLanguage').value = c.language || currentLang;
       el('fBook').value = c.book_title;
       el('fCategory').value = c.main_category;
       el('fTopic').value = c.topic;
@@ -1179,6 +1201,7 @@ function openCardModal(cardId = null){
       el('fInsight').value = c.actionable_insight;
     }
   } else {
+    el('fLanguage').value = currentLang;
     el('fBook').value = '';
     el('fCategory').value = '';
     el('fTopic').value = '';
@@ -1188,7 +1211,7 @@ function openCardModal(cardId = null){
   }
   
   if(db) {
-    const cats = dbExec('SELECT DISTINCT main_category FROM cards');
+    const cats = dbExec('SELECT DISTINCT main_category FROM cards WHERE language=?', [currentLang]);
     el('categoryList').innerHTML = cats.map(c=>`<option value="${escapeHtml(c.main_category)}">`).join('');
   }
   openModal('cardModalBackdrop');
@@ -1196,6 +1219,7 @@ function openCardModal(cardId = null){
 
 el('cardModalSave').addEventListener('click', ()=>{
   const data = {
+    language: el('fLanguage').value,
     book_title: el('fBook').value.trim() || (currentLang==='ar'?'بدون كتاب':'Uncategorized'),
     main_category: el('fCategory').value.trim() || (currentLang==='ar'?'عام':'General'),
     topic: el('fTopic').value.trim() || (currentLang==='ar'?'عام':'General'),
@@ -1210,18 +1234,18 @@ el('cardModalSave').addEventListener('click', ()=>{
   }
 
   if(editingCardId){
-    dbRun(`UPDATE cards SET book_title=?, main_category=?, topic=?, headline=?, takeaway=?, actionable_insight=? WHERE id=?`, 
-      [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight, editingCardId]);
+    dbRun(`UPDATE cards SET language=?, book_title=?, main_category=?, topic=?, headline=?, takeaway=?, actionable_insight=? WHERE id=?`, 
+      [data.language, data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight, editingCardId]);
     toast(currentLang==='ar'?'✅ تم تحديث البطاقة':'✅ Card updated');
   } else {
-    const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [data.book_title, data.headline]);
+    const existing = dbExec(`SELECT id FROM cards WHERE language=? AND book_title=? AND headline=?`, [data.language, data.book_title, data.headline]);
     if(existing.length > 0) {
       alert(currentLang==='ar'?'هذه البطاقة موجودة مسبقًا في قاعدة البيانات!':'This card already exists in the database!');
       return;
     }
 
-    dbRun(`INSERT INTO cards (book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?)`,
-      [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight]);
+    dbRun(`INSERT INTO cards (language, book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?,?)`,
+      [data.language, data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight]);
     const newId = dbExec('SELECT last_insert_rowid() as id')[0].id;
     dbRun(`INSERT INTO progress (card_id, status, times_seen) VALUES (?, 'new', 0)`, [newId]);
     toast(currentLang==='ar'?'✅ تمت الإضافة بنجاح':'✅ Card added successfully');
@@ -1255,9 +1279,10 @@ function readFileAsText(file){
 
 el('sampleLink').addEventListener('click', async ()=>{
   const sample = [
-    { book_title:"Atomic Habits", main_category:"Productivity", topic:"Habit Formation", headline:"1% Improvement Every Day", takeaway:"Small daily improvements compound into massive results over time.", actionable_insight:"Choose one tiny habit today and perform it for just 5 minutes daily for a week.", status:"new", times_seen:0 },
-    { book_title:"Atomic Habits", main_category:"Self Improvement", topic:"Identity & Behavior", headline:"Change Your Identity First", takeaway:"True behavior change is identity change. You align habits with who you believe you are.", actionable_insight:"Instead of saying 'I am trying to run', say 'I am a runner' and act accordingly.", status:"trying", times_seen:2 },
-    { book_title:"The Subtle Art", main_category:"Psychology", topic:"Values", headline:"Choose What Matters", takeaway:"You cannot care about everything without exhausting yourself. Select your values wisely.", actionable_insight:"Write down 3 core values for this month and consciously ignore non-essentials.", status:"following", times_seen:5 }
+    { language: "en", book_title:"Atomic Habits", main_category:"Productivity", topic:"Habit Formation", headline:"1% Improvement Every Day", takeaway:"Small daily improvements compound into massive results over time.", actionable_insight:"Choose one tiny habit today and perform it for just 5 minutes daily for a week.", status:"new", times_seen:0 },
+    { language: "en", book_title:"The Subtle Art", main_category:"Psychology", topic:"Values", headline:"Choose What Matters", takeaway:"You cannot care about everything without exhausting yourself. Select your values wisely.", actionable_insight:"Write down 3 core values for this month and consciously ignore non-essentials.", status:"following", times_seen:5 },
+    { language: "ar", book_title:"العادات الذرية", main_category:"الإنتاجية", topic:"بناء العادات", headline:"تحسن بنسبة 1% يوميًا", takeaway:"التحسينات الصغيرة اليومية تتراكم لتصبح نتائج ضخمة بمرور الوقت.", actionable_insight:"اختر عادة صغيرة اليوم وقم بها لمدة 5 دقائق فقط كل يوم لمدة أسبوع.", status:"new", times_seen:0 },
+    { language: "ar", book_title:"فن اللامبالاة", main_category:"علم النفس", topic:"القيم", headline:"اختر ما يهمك بحكمة", takeaway:"لا يمكنك الاهتمام بكل شيء دون استنزاف نفسك. اختر قيمك بحكمة.", actionable_insight:"اكتب 3 قيم أساسية لهذا الشهر وتجاهل ما دونها بوعي.", status:"following", times_seen:4 }
   ];
   el('pasteArea').value = JSON.stringify(sample, null, 2);
   await handleJsonText(el('pasteArea').value);
@@ -1267,11 +1292,11 @@ function refreshFilters(){
   if(!db) return;
   const labels = I18N[currentLang];
   const catSel = el('filterCategory');
-  const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
+  const cats = dbExec('SELECT DISTINCT main_category FROM cards WHERE language=? ORDER BY main_category', [currentLang]);
   catSel.innerHTML = `<option value="all">${labels.lblAllCats}</option>` +
     cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
 
-  const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
+  const books = dbExec('SELECT DISTINCT book_title FROM cards WHERE language=? ORDER BY book_title', [currentLang]);
   const bookSel = el('filterBook');
   bookSel.innerHTML = `<option value="all">${labels.lblAllBooks}</option>` +
     books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
@@ -1309,8 +1334,9 @@ function applyFilters(shuffle = false){
   const status = el('filterStatus').value;
   const search = el('searchInput').value.trim();
 
-  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE 1=1`;
-  const params = [];
+  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE c.language = ?`;
+  const params = [currentLang];
+  
   if(cat !== 'all'){ sql += ' AND c.main_category = ?'; params.push(cat); }
   if(book !== 'all'){ sql += ' AND c.book_title = ?'; params.push(book); }
   
@@ -1347,10 +1373,10 @@ function applyFilters(shuffle = false){
 
 function renderStats(){
   if(!db) return;
-  const total = dbExec('SELECT COUNT(*) as n FROM cards')[0].n;
-  const following = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='following'")[0].n;
-  const trying = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='trying'")[0].n;
-  const isNew = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='new'")[0].n;
+  const total = dbExec('SELECT COUNT(*) as n FROM cards WHERE language=?', [currentLang])[0].n;
+  const following = dbExec("SELECT COUNT(*) as n FROM progress p JOIN cards c ON p.card_id=c.id WHERE c.language=? AND p.status='following'", [currentLang])[0].n;
+  const trying = dbExec("SELECT COUNT(*) as n FROM progress p JOIN cards c ON p.card_id=c.id WHERE c.language=? AND p.status='trying'", [currentLang])[0].n;
+  const isNew = dbExec("SELECT COUNT(*) as n FROM progress p JOIN cards c ON p.card_id=c.id WHERE c.language=? AND p.status='new'", [currentLang])[0].n;
   
   el('statTotal').textContent = total;
   el('statFollowing').textContent = following;
@@ -1429,7 +1455,7 @@ function renderLearnStage(){
       <div class="empty-state">
         <div class="ic">🗂️</div>
         <h3>${labels.lblNoCardsMatch}</h3>
-        <p>${db && dbExec('SELECT COUNT(*) as n FROM cards')[0].n ? (currentLang==='ar'?'جرّب تعديل الفلاتر أو البحث.':'Try adjusting filters or search.') : (currentLang==='ar'?'ابدأ باستيراد بطاقاتك من واجهة الاستيراد.':'Start importing cards from the Import view.')}</p>
+        <p>${db && dbExec('SELECT COUNT(*) as n FROM cards WHERE language=?', [currentLang])[0].n ? (currentLang==='ar'?'جرّب تعديل الفلاتر أو البحث.':'Try adjusting filters or search.') : (currentLang==='ar'?'ابدأ باستيراد بطاقاتك من واجهة الاستيراد، أو تأكد من اختيار لغة الواجهة الصحيحة.':'Start importing cards, or make sure the correct interface language is selected.')}</p>
       </div>`;
     el('deckIndex').textContent = '';
     return;
@@ -1547,11 +1573,11 @@ function refreshDbFilters(){
   if(!db) return;
   const labels = I18N[currentLang];
   const catSel = el('dbFilterCategory');
-  const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
+  const cats = dbExec('SELECT DISTINCT main_category FROM cards WHERE language=? ORDER BY main_category', [currentLang]);
   catSel.innerHTML = `<option value="all">${labels.lblAllCats}</option>` +
     cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
 
-  const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
+  const books = dbExec('SELECT DISTINCT book_title FROM cards WHERE language=? ORDER BY book_title', [currentLang]);
   const bookSel = el('dbFilterBook');
   bookSel.innerHTML = `<option value="all">${labels.lblAllBooks}</option>` +
     books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
@@ -1578,8 +1604,9 @@ function applyDbFilters(){
   
   dbGroupBy = el('groupBySelect').value;
 
-  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE 1=1`;
-  const params = [];
+  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE c.language = ?`;
+  const params = [currentLang];
+  
   if(cat !== 'all'){ sql += ' AND c.main_category = ?'; params.push(cat); }
   if(book !== 'all'){ sql += ' AND c.book_title = ?'; params.push(book); }
   if(status !== 'all'){ sql += ' AND p.status = ?'; params.push(status); }
@@ -1829,7 +1856,7 @@ function refreshPdfScopeOptions(){
       valSel.style.display='inline-block';
       valSel.innerHTML = '';
       const col = sel.value === 'category' ? 'main_category' : 'book_title';
-      const items = dbExec(`SELECT DISTINCT ${col} as txt FROM cards ORDER BY txt`);
+      const items = dbExec(`SELECT DISTINCT ${col} as txt FROM cards WHERE language=? ORDER BY txt`, [currentLang]);
       valSel.innerHTML = items.map(i=> `<option value="${escapeHtml(i.txt)}">${escapeHtml(i.txt)}</option>`).join('');
     }
   };
@@ -1839,12 +1866,12 @@ function refreshPdfScopeOptions(){
 el('pdfExportScopeBtn').addEventListener('click', ()=>{
   closeModal('settingsModalBackdrop');
   if(!db) return;
-  const scope = el('pdfScopeSelect').value;
-  const val = el('pdfScopeValue').value;
-  let sql = `SELECT c.*, p.status FROM cards c JOIN progress p ON p.card_id=c.id`;
-  let params = [];
-  if(scope === 'category'){ sql += ' WHERE c.main_category=?'; params.push(val); }
-  else if(scope === 'book'){ sql += ' WHERE c.book_title=?'; params.push(val); }
+  const scope = el('pdfScopeSelect');
+  const val = el('pdfScopeValue');
+  let sql = `SELECT c.*, p.status FROM cards c JOIN progress p ON p.card_id=c.id WHERE c.language=?`;
+  let params = [currentLang];
+  if(scope === 'category'){ sql += ' AND c.main_category=?'; params.push(val); }
+  else if(scope === 'book'){ sql += ' AND c.book_title=?'; params.push(val); }
   
   const cards = dbExec(sql, params);
   doPdfPrint(cards);
@@ -1885,7 +1912,7 @@ function exportAllToJson() {
   if(!db) return;
   
   const rows = dbExec(`
-    SELECT c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight,
+    SELECT c.language, c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight,
            p.status, p.times_seen, p.last_reviewed
     FROM cards c 
     JOIN progress p ON p.card_id = c.id
