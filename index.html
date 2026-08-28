@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ارتقاء — بطاقات المعرفة المصغّرة</title>
+<title id="docTitle">ارتقاء — بطاقات المعرفة المصغّرة</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
@@ -174,7 +174,7 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
   content:''; position:absolute; inset:0; border-radius:20px;
   background:linear-gradient(165deg, rgba(63,143,134,0.06), transparent 40%); pointer-events:none;
 }
-.badges{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; padding-right: 42px; } /* padding to avoid TTS button overlap */
+.badges{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
 .badge{ font-size:11.5px; font-weight:700; padding:5px 12px; border-radius:999px; font-family:var(--font-body); }
 .badge.cat{ background:var(--teal); color:#eafff9; }
 .badge.book{ background:rgba(0,0,0,0.08); color:#4a4030; border:1px solid rgba(0,0,0,0.12); }
@@ -186,23 +186,15 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 .lcard .topic{ font-size:12.5px; color:#7c7358; margin-bottom:6px; font-weight:500; }
 .lcard h3.headline{ font-family:var(--font-display); font-weight:800; font-size:22px; line-height:1.5; margin:0 0 16px; color:var(--ink); }
 .lcard .takeaway{ font-size:15.5px; line-height:1.95; margin:0 0 16px; color:#2c2a22; }
-.insight-box{ background:rgba(63,143,134,0.08); border-right:3px solid var(--teal); padding:12px 14px; border-radius:8px; margin-top:14px; }
+
+.insight-box{ background:rgba(63,143,134,0.08); padding:12px 14px; border-radius:8px; margin-top:14px; }
+html[dir="rtl"] .insight-box{ border-right:3px solid var(--teal); }
+html[dir="ltr"] .insight-box{ border-left:3px solid var(--teal); }
+
 .insight-box .lbl{ font-size:11.5px; font-weight:700; color:var(--teal); display:block; margin-bottom:4px; }
 .insight-box p{ margin:0; font-size:14px; line-height:1.8; color:#33362e; }
 
 .meta-row{ display:flex; justify-content:space-between; margin-top:18px; font-size:11px; color:#8a8368; }
-
-.tts-btn {
-  position: absolute;
-  top: 24px; left: 24px;
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(198,168,110,0.6);
-  border-radius: 50%; width: 38px; height: 38px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: 0.2s; font-size: 17px;
-  z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-}
-.tts-btn:hover { background: var(--gold-bright); color: var(--ink); transform: scale(1.05); }
 
 .card-actions{ display:flex; gap:10px; max-width:560px; width:100%; }
 .act-btn{
@@ -258,12 +250,18 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 .tile:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
 .tile.selected{ border-color:var(--gold-bright); box-shadow:0 0 0 3px rgba(224,178,92,0.25); }
 .tile .tile-check{
-  position:absolute; top:10px; left:10px; width:20px; height:20px; border-radius:6px;
+  position:absolute; top:10px; width:20px; height:20px; border-radius:6px;
   border:2px solid rgba(0,0,0,0.25); background:rgba(255,255,255,0.6);
   display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
 }
+html[dir="rtl"] .tile .tile-check{ left:10px; }
+html[dir="ltr"] .tile .tile-check{ right:10px; }
+
 .tile.selected .tile-check{ background:var(--gold-bright); border-color:var(--gold-bright); color:var(--ink); }
-.tile .tile-badges{ display:flex; gap:6px; flex-wrap:wrap; padding-left:26px; }
+.tile .tile-badges{ display:flex; gap:6px; flex-wrap:wrap; }
+html[dir="rtl"] .tile .tile-badges{ padding-left:26px; }
+html[dir="ltr"] .tile .tile-badges{ padding-right:26px; }
+
 .tile .tile-badge{ font-size:10px; font-weight:700; padding:3px 9px; border-radius:999px; background:var(--teal); color:#eafff9; }
 .tile .tile-badge.book{ background:rgba(0,0,0,0.08); color:#4a4030; }
 .tile .tile-badge.status.following{ background:rgba(63,143,94,0.25); color:#1f5c34; }
@@ -294,7 +292,11 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 }
 .modal h3{ font-family:var(--font-display); margin:0 0 6px; font-size:19px; }
 .modal .sub{ color:#9fb0b6; font-size:12.5px; margin-bottom:18px; }
-.modal-close{ float:left; background:none; border:none; color:var(--parchment); font-size:20px; cursor:pointer; opacity:.7; }
+
+.modal-close{ background:none; border:none; color:var(--parchment); font-size:20px; cursor:pointer; opacity:.7; }
+html[dir="rtl"] .modal-close{ float:left; }
+html[dir="ltr"] .modal-close{ float:right; }
+
 .modal-close:hover{ opacity:1; }
 .field{ margin-bottom:14px; }
 .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--gold-bright); margin-bottom:6px; }
@@ -307,10 +309,13 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 .modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap; }
 
 #learnModalBackdrop .modal-close { 
-  position:absolute; top:-40px; left:0; width:34px; height:34px; border-radius:17px; 
+  position:absolute; top:-40px; width:34px; height:34px; border-radius:17px; 
   background:var(--night-2); color:var(--parchment); border:1px solid var(--line); 
   z-index:10; display:flex; align-items:center; justify-content:center; opacity:1; font-size: 16px; 
 }
+html[dir="rtl"] #learnModalBackdrop .modal-close { left: 0; }
+html[dir="ltr"] #learnModalBackdrop .modal-close { right: 0; }
+
 #learnModalBackdrop .modal-close:hover { border-color: var(--gold-bright); }
 
 .settings-section{ margin-bottom:22px; }
@@ -332,7 +337,6 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
   .lcard{ padding:22px 18px 18px; margin-bottom:18px; }
   .lcard h3.headline{ font-size:19px; }
   .card-actions{ flex-wrap:wrap; }
-  .tts-btn { top: 16px; left: 16px; width: 34px; height: 34px; font-size: 15px; }
 }
 
 .toast{
@@ -349,13 +353,17 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
   body *{ visibility:hidden; }
   #printArea, #printArea *{ visibility:visible; }
   #printArea{ display:block; position:absolute; top:0; right:0; left:0; }
-  .print-card{ page-break-after:always; padding:28px; direction:rtl; color:#000; }
+  .print-card{ page-break-after:always; padding:28px; color:#000; }
+  html[dir="rtl"] .print-card{ direction:rtl; }
+  html[dir="ltr"] .print-card{ direction:ltr; }
   .print-card:last-child{ page-break-after:auto; }
   .print-card .p-badges{ font-size:11px; color:#666; margin-bottom:10px; }
   .print-card h2{ font-family:'Cairo', sans-serif; font-size:22px; margin:0 0 14px; }
   .print-card .p-topic{ font-size:12px; color:#777; margin-bottom:6px; }
   .print-card .p-take{ font-size:14px; line-height:1.9; margin-bottom:14px; }
-  .print-card .p-insight{ font-size:13px; line-height:1.8; border-right:3px solid #2f6f68; padding:10px 14px; background:#f4f4f0; }
+  .print-card .p-insight{ font-size:13px; line-height:1.8; padding:10px 14px; background:#f4f4f0; }
+  html[dir="rtl"] .print-card .p-insight{ border-right:3px solid #2f6f68; }
+  html[dir="ltr"] .print-card .p-insight{ border-left:3px solid #2f6f68; }
   .print-card .p-insight b{ display:block; margin-bottom:4px; color:#2f6f68; }
 }
 </style>
@@ -364,17 +372,17 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 
 <header class="topbar">
   <div class="brandmark">
-    <div class="glyph">ا</div>
+    <div class="glyph" id="brandGlyph">ا</div>
     <div>
-      <h1>ارتقاء</h1>
+      <h1 id="brandTitle">ارتقاء</h1>
       <span class="tag">MICRO-LEARNING</span>
     </div>
   </div>
   <div class="topbar-right">
     <nav>
-      <button class="navbtn active" data-view="import">📥 استيراد</button>
-      <button class="navbtn" data-view="learn">📖 التعلم</button>
-      <button class="navbtn" data-view="database">🗂 قاعدة البيانات</button>
+      <button class="navbtn active" data-view="import" data-i18n="navImport">📥 استيراد</button>
+      <button class="navbtn" data-view="learn" data-i18n="navLearn">📖 التعلم</button>
+      <button class="navbtn" data-view="database" data-i18n="navDb">🗂 قاعدة البيانات</button>
     </nav>
     <button class="icon-btn" id="settingsBtn" title="الإعدادات">⚙️</button>
   </div>
@@ -383,58 +391,58 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 <main>
   <section class="view active" id="view-import">
     <div class="hero">
-      <h2>حوّل كتبك إلى بطاقات معرفة</h2>
-      <p>ارفع ملف JSON يحتوي على بطاقات التعلّم المصغّرة، وسيتم تنظيمها تلقائيًا دون تكرار في قاعدة بيانات محلية بمتصفحك.</p>
+      <h2 data-i18n="heroTitle">حوّل كتبك إلى بطاقات معرفة</h2>
+      <p data-i18n="heroDesc">ارفع ملف JSON يحتوي على بطاقات التعلّم المصغّرة وسير عملك، وسيتم تنظيمها تلقائيًا دون تكرار في قاعدة بيانات محلية بمتصفحك.</p>
     </div>
 
     <div class="dropzone" id="dropzone">
       <div class="icon">📄</div>
-      <h3>اسحب وأفلت ملف JSON هنا</h3>
-      <p>أو اضغط للاختيار من جهازك (.json)</p>
+      <h3 data-i18n="dropzoneTitle">اسحب وأفلت ملف JSON هنا</h3>
+      <p data-i18n="dropzoneSub">أو اضغط للاختيار من جهازك (.json)</p>
       <input type="file" id="fileInput" accept="application/json,.json">
     </div>
 
-    <div class="orline">أو الصق النص مباشرة</div>
+    <div class="orline" data-i18n="orText">أو الصق النص مباشرة</div>
 
     <textarea class="pastebox" id="pasteArea" placeholder='[{"book_title": "...", "main_category": "...", "topic": "...", "headline": "...", "takeaway": "...", "actionable_insight": "..."}]'></textarea>
 
     <div class="center-actions">
-      <button class="btn btn-gold" id="importBtn">استيراد البطاقات</button>
-      <button class="btn btn-ghost" id="addCardBtn">➕ إضافة بطاقة يدويًا</button>
+      <button class="btn btn-gold" id="importBtn" data-i18n="importBtn">استيراد البطاقات والتقدم</button>
+      <button class="btn btn-ghost" id="addCardBtn" data-i18n="addManualBtn">➕ إضافة بطاقة يدويًا</button>
     </div>
 
     <div class="status-msg" id="importStatus"></div>
-    <div class="sample-toggle"><a id="sampleLink">تحميل بيانات تجريبية للمعاينة</a></div>
+    <div class="sample-toggle"><a id="sampleLink" data-i18n="sampleLink">تحميل بيانات تجريبية للمعاينة</a></div>
   </section>
 
   <section class="view" id="view-learn">
 
     <div class="filters">
       <select id="learnViewSelect">
-        <option value="single" selected>🃏 بطاقة تلو الأخرى (الافتراضي)</option>
-        <option value="feed">📜 تمرير عمودي (Feed)</option>
-        <option value="grid">🔲 شبكة تفاعلية</option>
+        <option value="single" selected data-i18n="optSingle">🃏 بطاقة تلو الأخرى (الافتراضي)</option>
+        <option value="feed" data-i18n="optFeed">📜 تمرير عمودي (Feed)</option>
+        <option value="grid" data-i18n="optGrid">🔲 شبكة تفاعلية</option>
       </select>
       <select id="filterCategory"></select>
       <select id="filterBook"></select>
       <select id="filterStatus">
-        <option value="all">كل البطاقات</option>
-        <option value="needs_action" selected>في طور التعلم (لا أطبقها/أحاول)</option>
-        <option value="new">لا أطبقها بعد</option>
-        <option value="trying">أحاول تطبيقها</option>
-        <option value="following">أطبقها بانتظام</option>
+        <option value="all" data-i18n="stAll">كل البطاقات</option>
+        <option value="needs_action" selected data-i18n="stNeedsAction">في طور التعلم (لا أطبقها/أحاول)</option>
+        <option value="new" data-i18n="stNew">لا أطبقها بعد</option>
+        <option value="trying" data-i18n="stTrying">أحاول تطبيقها</option>
+        <option value="following" data-i18n="stFollowing">أطبقها بانتظام</option>
       </select>
-      <input type="text" class="search-input" id="searchInput" placeholder="🔍 بحث في البطاقات...">
-      <button class="btn btn-ghost" id="shuffleBtn">🔀 عشوائي ذكي</button>
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 بحث في البطاقات..." data-i18n-ph="phSearch">
+      <button class="btn btn-ghost" id="shuffleBtn" data-i18n="btnShuffle">🔀 عشوائي ذكي</button>
     </div>
 
     <div class="progress-bar-wrap">
       <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-stats">
-        <span>الإجمالي: <b id="statTotal">0</b></span>
-        <span>أطبقها: <b id="statFollowing">0</b></span>
-        <span>أحاول: <b id="statTrying">0</b></span>
-        <span>لا أطبقها: <b id="statNew">0</b></span>
+        <span><span data-i18n="lblTotal">الإجمالي</span>: <b id="statTotal">0</b></span>
+        <span><span data-i18n="lblFollowing">أطبقها</span>: <b id="statFollowing">0</b></span>
+        <span><span data-i18n="lblTrying">أحاول</span>: <b id="statTrying">0</b></span>
+        <span><span data-i18n="lblNew">لا أطبقها</span>: <b id="statNew">0</b></span>
       </div>
     </div>
 
@@ -450,56 +458,56 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
       <select id="dbFilterCategory"></select>
       <select id="dbFilterBook"></select>
       <select id="dbFilterStatus">
-        <option value="all">كل الحالات</option>
-        <option value="new">لا أطبقه بعد</option>
-        <option value="trying">أحاول تطبيقه</option>
-        <option value="following">أطبق هذا المبدأ</option>
+        <option value="all" data-i18n="stAllStatuses">كل الحالات</option>
+        <option value="new" data-i18n="stNew">لا أطبقه بعد</option>
+        <option value="trying" data-i18n="stTrying">أحاول تطبيقه</option>
+        <option value="following" data-i18n="stFollowing">أطبق هذا المبدأ</option>
       </select>
-      <input type="text" class="search-input" id="dbSearchInput" placeholder="🔍 بحث في البطاقات...">
+      <input type="text" class="search-input" id="dbSearchInput" placeholder="🔍 بحث في البطاقات..." data-i18n-ph="phSearch">
     </div>
 
     <div class="db-toolbar">
       <div class="grp">
-        <label style="font-size:12.5px;color:#9fb0b6;">طريقة العرض:</label>
+        <label style="font-size:12.5px;color:#9fb0b6;" data-i18n="lblDisplayMode">طريقة العرض:</label>
         <select id="viewModeSelect">
-          <option value="single">بطاقة تلو الأخرى</option>
-          <option value="20" selected>20 بطاقة بالصفحة</option>
-          <option value="40">40 بطاقة بالصفحة</option>
-          <option value="60">60 بطاقة بالصفحة</option>
+          <option value="single" data-i18n="vmSingle">بطاقة تلو الأخرى</option>
+          <option value="20" selected data-i18n="vm20">20 بطاقة بالصفحة</option>
+          <option value="40" data-i18n="vm40">40 بطاقة بالصفحة</option>
+          <option value="60" data-i18n="vm60">60 بطاقة بالصفحة</option>
         </select>
-        <label style="font-size:12.5px;color:#9fb0b6;">تجميع حسب:</label>
+        <label style="font-size:12.5px;color:#9fb0b6;" data-i18n="lblGroupBy">تجميع حسب:</label>
         <select id="groupBySelect">
-          <option value="none">بدون تجميع</option>
-          <option value="main_category">التصنيف</option>
-          <option value="book_title">الكتاب</option>
+          <option value="none" data-i18n="gbNone">بدون تجميع</option>
+          <option value="main_category" data-i18n="gbCat">التصنيف</option>
+          <option value="book_title" data-i18n="gbBook">الكتاب</option>
         </select>
       </div>
       <div class="grp">
-        <button class="btn btn-ghost btn-sm" id="selectModeBtn">☑ تحديد متعدد</button>
-        <button class="btn btn-ghost btn-sm" id="dbExportJsonBtn" title="تصدير بيانات جميع البطاقات كملف JSON لفتحها في جهاز آخر">⬇ تصدير كملف JSON</button>
-        <button class="btn btn-gold btn-sm" id="dbAddCardBtn">➕ إضافة بطاقة</button>
+        <button class="btn btn-ghost btn-sm" id="selectModeBtn" data-i18n="btnSelectMode">☑ تحديد متعدد</button>
+        <button class="btn btn-ghost btn-sm" id="dbExportJsonBtn" title="تصدير بيانات البطاقات والتقدم كملف JSON" data-i18n="btnExportJson">⬇ تصدير التقدم كملف JSON</button>
+        <button class="btn btn-gold btn-sm" id="dbAddCardBtn" data-i18n="btnAddCard">➕ إضافة بطاقة</button>
       </div>
     </div>
 
     <div class="selectbar" id="selectBar">
-      <span class="cnt"><span id="selCount">0</span> بطاقة محددة</span>
-      <button class="btn btn-ghost btn-sm" id="selAllBtn">تحديد الكل في هذه الصفحة</button>
-      <button class="btn btn-ghost btn-sm" id="selNoneBtn">إلغاء التحديد</button>
+      <span class="cnt"><span id="selCount">0</span> <span data-i18n="lblSelectedCards">بطاقة محددة</span></span>
+      <button class="btn btn-ghost btn-sm" id="selAllBtn" data-i18n="btnSelAll">تحديد الكل في هذه الصفحة</button>
+      <button class="btn btn-ghost btn-sm" id="selNoneBtn" data-i18n="btnSelNone">إلغاء التحديد</button>
       <div class="spacer"></div>
-      <button class="btn btn-teal btn-sm" id="selExportPdfBtn">⬇ تصدير المحدد PDF</button>
-      <button class="btn btn-danger btn-sm" id="selDeleteBtn">🗑 حذف المحدد</button>
+      <button class="btn btn-teal btn-sm" id="selExportPdfBtn" data-i18n="btnExportPdf">⬇ تصدير المحدد PDF</button>
+      <button class="btn btn-danger btn-sm" id="selDeleteBtn" data-i18n="btnDeleteSelected">🗑 حذف المحدد</button>
     </div>
 
-    <div class="db-count"><b id="dbResultCount">0</b> بطاقة مطابقة</div>
+    <div class="db-count"><b id="dbResultCount">0</b> <span data-i18n="lblMatchingCards">بطاقة مطابقة</span></div>
     <div id="dbContent" style="margin-top:14px; width:100%;"></div>
 
     <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
-      <button class="btn btn-ghost" id="loadMoreBtn">جارٍ تحميل المزيد ⬇</button>
+      <button class="btn btn-ghost" id="loadMoreBtn" data-i18n="btnLoadMore">جارٍ تحميل المزيد ⬇</button>
     </div>
     <div class="single-nav" id="singleNavWrap" style="display:none;">
-      <button class="btn btn-ghost" id="singlePrevBtn">◀ السابق</button>
+      <button class="btn btn-ghost" id="singlePrevBtn" data-i18n="btnPrev">◀ السابق</button>
       <span class="deck-index" id="singlePosLabel" style="margin:0;align-self:center;"></span>
-      <button class="btn btn-ghost" id="singleNextBtn">التالي ▶</button>
+      <button class="btn btn-ghost" id="singleNextBtn" data-i18n="btnNext">التالي ▶</button>
     </div>
 
   </section>
@@ -518,36 +526,36 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 <div class="modal-backdrop" id="cardModalBackdrop">
   <div class="modal">
     <button class="modal-close" id="cardModalClose">✕</button>
-    <h3 id="cardModalTitle">إضافة بطاقة</h3>
-    <div class="sub">املأ الحقول التالية ثم احفظ</div>
+    <h3 id="cardModalTitle" data-i18n="titleAddCard">إضافة بطاقة</h3>
+    <div class="sub" data-i18n="subAddCard">املأ الحقول التالية ثم احفظ</div>
     <div class="field">
-      <label>الكتاب</label>
-      <input type="text" id="fBook" placeholder="اسم الكتاب">
+      <label data-i18n="lblBook">الكتاب</label>
+      <input type="text" id="fBook" placeholder="اسم الكتاب" data-i18n-ph="phBook">
     </div>
     <div class="field">
-      <label>التصنيف</label>
-      <input type="text" id="fCategory" list="categoryList" placeholder="التصنيف الرئيسي">
+      <label data-i18n="lblCategory">التصنيف</label>
+      <input type="text" id="fCategory" list="categoryList" placeholder="التصنيف الرئيسي" data-i18n-ph="phCategory">
       <datalist id="categoryList"></datalist>
     </div>
     <div class="field">
-      <label>الموضوع الفرعي</label>
-      <input type="text" id="fTopic" placeholder="الموضوع">
+      <label data-i18n="lblTopic">الموضوع الفرعي</label>
+      <input type="text" id="fTopic" placeholder="الموضوع" data-i18n-ph="phTopic">
     </div>
     <div class="field">
-      <label>العنوان</label>
-      <input type="text" id="fHeadline" placeholder="عنوان البطاقة">
+      <label data-i18n="lblHeadline">العنوان</label>
+      <input type="text" id="fHeadline" placeholder="عنوان البطاقة" data-i18n-ph="phHeadline">
     </div>
     <div class="field">
-      <label>الفكرة الأساسية</label>
-      <textarea id="fTakeaway" placeholder="الفكرة أو الخلاصة"></textarea>
+      <label data-i18n="lblTakeaway">الفكرة الأساسية</label>
+      <textarea id="fTakeaway" placeholder="الفكرة أو الخلاصة" data-i18n-ph="phTakeaway"></textarea>
     </div>
     <div class="field">
-      <label>نصيحة قابلة للتطبيق</label>
-      <textarea id="fInsight" placeholder="خطوة عملية"></textarea>
+      <label data-i18n="lblInsight">نصيحة قابلة للتطبيق</label>
+      <textarea id="fInsight" placeholder="خطوة عملية" data-i18n-ph="phInsight"></textarea>
     </div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="cardModalCancel">إلغاء</button>
-      <button class="btn btn-gold" id="cardModalSave">حفظ البطاقة</button>
+      <button class="btn btn-ghost" id="cardModalCancel" data-i18n="btnCancel">إلغاء</button>
+      <button class="btn btn-gold" id="cardModalSave" data-i18n="btnSaveCard">حفظ البطاقة</button>
     </div>
   </div>
 </div>
@@ -555,37 +563,50 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 <div class="modal-backdrop" id="settingsModalBackdrop">
   <div class="modal" style="max-width:560px;">
     <button class="modal-close" id="settingsModalClose">✕</button>
-    <h3>⚙️ الإعدادات</h3>
-    <div class="sub">التصدير، الاستيراد، وإدارة قاعدة البيانات</div>
+    <h3 data-i18n="settingsTitle">⚙️ الإعدادات</h3>
+    <div class="sub" data-i18n="settingsSub">اللغة، التصدير، الاستيراد، وإدارة قاعدة البيانات</div>
 
     <div class="settings-section">
-      <h4>📤 تصدير البيانات</h4>
-      <p class="desc">نزّل نسخة كاملة من بطاقاتك لتفتحها على جهاز آخر، أو قاعدة البيانات للنسخ الاحتياطي</p>
+      <h4 data-i18n="hdrLang">🌐 لغة الواجهة (Language)</h4>
+      <p class="desc" data-i18n="descLang">اختر لغة العرض المناسبة لتعلمك</p>
       <div class="settings-row">
-        <button class="btn btn-ghost btn-sm" id="exportJsonBtn">⬇ تنزيل البطاقات كملف JSON</button>
-        <button class="btn btn-teal btn-sm" id="exportDbBtn">⬇ تنزيل قاعدة البيانات كاملة (SQLite)</button>
+        <select id="langSelect" style="min-width:180px;">
+          <option value="ar">العربية (Arabic)</option>
+          <option value="en">English (الإنجليزية)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="settings-section">
+      <h4 data-i18n="hdrExport">📤 تصدير البيانات والتقدم</h4>
+      <p class="desc" data-i18n="descExport">نزّل نسخة كاملة من بطاقاتك مع حالة تقدمك كملف JSON لفتحها في جهاز آخر</p>
+      <div class="settings-row">
+        <button class="btn btn-ghost btn-sm" id="exportJsonBtn" data-i18n="btnDownloadJson">⬇ تنزيل التقدم والبطاقات كملف JSON</button>
+        <button class="btn btn-teal btn-sm" id="exportDbBtn" data-i18n="btnDownloadDb">⬇ تنزيل قاعدة البيانات كاملة (SQLite)</button>
       </div>
     </div>
 
     <div class="settings-section">
-      <h4>🖨 تصدير كـ PDF</h4>
-      <p class="desc">اختر نطاق البطاقات التي تريد تصديرها كملف PDF (تُفتح نافذة الطباعة لحفظها كـ PDF)</p>
+      <h4 data-i18n="hdrPdf">🖨 تصدير كـ PDF</h4>
+      <p class="desc" data-i18n="descPdf">اختر نطاق البطاقات التي تريد تصديرها كملف PDF</p>
       <div class="scope-picker">
         <select id="pdfScopeSelect">
-          <option value="all">كل البطاقات</option>
-          <option value="category">حسب التصنيف</option>
-          <option value="book">حسب الكتاب</option>
+          <option value="all" data-i18n="pdfAllCards">كل البطاقات</option>
+          <option value="category" data-i18n="pdfByCat">حسب التصنيف</option>
+          <option value="book" data-i18n="pdfByBook">حسب الكتاب</option>
         </select>
         <select id="pdfScopeValue" style="display:none;"></select>
       </div>
-      <button class="btn btn-teal btn-sm" id="pdfExportScopeBtn">⬇ تصدير PDF</button>
+      <button class="btn btn-teal btn-sm" id="pdfExportScopeBtn" data-i18n="btnExportPdf">⬇ تصدير PDF</button>
     </div>
 
     <div class="settings-section">
-      <h4>↩ استعادة نسخة SQLite محفوظة</h4>
-      <p class="desc">استرجاع قاعدة بيانات SQLite كاملة محفوظة مسبقًا من جهازك</p>
+      <h4 data-i18n="hdrRestore">↩ استعادة نسخة SQLite محفوظة</h4>
+      <p class="desc" data-i18n="descRestore">استرجاع قاعدة بيانات SQLite كاملة محفوظة مسبقًا من جهازك</p>
       <div class="settings-row">
-        <button class="btn btn-ghost btn-sm" id="loadDbBtn">اختيار ملف .sqlite</button>
+        <button class="btn btn-ghost btn-sm" id="loadDbBtn" data-i18n="btnChooseSqlite">اختيار ملف .sqlite</button>
         <input type="file" id="dbFileInput" accept=".sqlite,.db" style="display:none">
       </div>
     </div>
@@ -593,9 +614,9 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
     <div class="settings-divider"></div>
 
     <div class="danger-zone">
-      <h4>⚠ منطقة الخطر</h4>
-      <p class="desc">هذا الإجراء لا يمكن التراجع عنه — تأكد من تنزيل نسخة احتياطية أولًا</p>
-      <button class="btn btn-danger btn-sm" id="resetBtn">🗑 مسح جميع البيانات</button>
+      <h4 data-i18n="hdrDanger">⚠ منطقة الخطر</h4>
+      <p class="desc" data-i18n="descDanger">هذا الإجراء لا يمكن التراجع عنه — تأكد من تنزيل نسخة احتياطية أولًا</p>
+      <button class="btn btn-danger btn-sm" id="resetBtn" data-i18n="btnReset">🗑 مسح جميع البيانات</button>
     </div>
   </div>
 </div>
@@ -603,11 +624,260 @@ select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright)
 <div id="printArea"></div>
 
 <script>
-const STATUS_LABELS = { 
-  new: "لا أطبقه بعد", 
-  trying: "أحاول تطبيقه", 
-  following: "أطبق هذا المبدأ بانتظام" 
+const I18N = {
+  ar: {
+    docTitle: "ارتقاء — بطاقات المعرفة المصغّرة",
+    brandTitle: "ارتقاء",
+    brandGlyph: "ا",
+    navImport: "📥 استيراد",
+    navLearn: "📖 التعلم",
+    navDb: "🗂 قاعدة البيانات",
+    heroTitle: "حوّل كتبك إلى بطاقات معرفة",
+    heroDesc: "ارفع ملف JSON يحتوي على بطاقات التعلّم المصغّرة وسير عملك، وسيتم تنظيمها تلقائيًا دون تكرار في قاعدة بيانات محلية بمتصفحك.",
+    dropzoneTitle: "اسحب وأفلت ملف JSON هنا",
+    dropzoneSub: "أو اضغط للاختيار من جهازك (.json)",
+    orText: "أو الصق النص مباشرة",
+    importBtn: "استيراد البطاقات والتقدم",
+    addManualBtn: "➕ إضافة بطاقة يدويًا",
+    sampleLink: "تحميل بيانات تجريبية للمعاينة",
+    
+    optSingle: "🃏 بطاقة تلو الأخرى (الافتراضي)",
+    optFeed: "📜 تمرير عمودي (Feed)",
+    optGrid: "🔲 شبكة تفاعلية",
+    stAll: "كل البطاقات",
+    stNeedsAction: "في طور التعلم (لا أطبقها/أحاول)",
+    stNew: "لا أطبقها بعد",
+    stTrying: "أحاول تطبيقها",
+    stFollowing: "أطبقها بانتظام",
+    phSearch: "🔍 بحث في البطاقات...",
+    btnShuffle: "🔀 عشوائي ذكي",
+    
+    lblTotal: "الإجمالي",
+    lblFollowing: "أطبقها",
+    lblTrying: "أحاول",
+    lblNew: "لا أطبقها",
+    
+    stAllStatuses: "كل الحالات",
+    lblDisplayMode: "طريقة العرض:",
+    vmSingle: "بطاقة تلو الأخرى",
+    vm20: "20 بطاقة بالصفحة",
+    vm40: "40 بطاقة بالصفحة",
+    vm60: "60 بطاقة بالصفحة",
+    lblGroupBy: "تجميع حسب:",
+    gbNone: "بدون تجميع",
+    gbCat: "التصنيف",
+    gbBook: "الكتاب",
+    btnSelectMode: "☑ تحديد متعدد",
+    btnExportJson: "⬇ تصدير التقدم كملف JSON",
+    btnAddCard: "➕ إضافة بطاقة",
+    
+    lblSelectedCards: "بطاقة محددة",
+    btnSelAll: "تحديد الكل في هذه الصفحة",
+    btnSelNone: "إلغاء التحديد",
+    btnExportPdf: "⬇ تصدير PDF",
+    btnDeleteSelected: "🗑 حذف المحدد",
+    lblMatchingCards: "بطاقة مطابقة",
+    
+    btnLoadMore: "جارٍ تحميل المزيد ⬇",
+    btnPrev: "◀ السابق",
+    btnNext: "التالي ▶",
+    
+    titleAddCard: "إضافة بطاقة",
+    titleEditCard: "تعديل البطاقة",
+    subAddCard: "املأ الحقول التالية ثم احفظ",
+    lblBook: "الكتاب",
+    lblCategory: "التصنيف",
+    lblTopic: "الموضوع الفرعي",
+    lblHeadline: "العنوان",
+    lblTakeaway: "الفكرة الأساسية",
+    lblInsight: "نصيحة قابلة للتطبيق",
+    phBook: "اسم الكتاب",
+    phCategory: "التصنيف الرئيسي",
+    phTopic: "الموضوع",
+    phHeadline: "عنوان البطاقة",
+    phTakeaway: "الفكرة أو الخلاصة",
+    phInsight: "خطوة عملية",
+    btnCancel: "إلغاء",
+    btnSaveCard: "حفظ البطاقة",
+    
+    settingsTitle: "⚙️ الإعدادات",
+    settingsSub: "اللغة، التصدير، الاستيراد، وإدارة قاعدة البيانات",
+    hdrLang: "🌐 لغة الواجهة (Language)",
+    descLang: "اختر لغة العرض المناسبة لتعلمك",
+    hdrExport: "📤 تصدير البيانات والتقدم",
+    descExport: "نزّل نسخة كاملة من بطاقاتك مع حالة تقدمك كملف JSON لفتحها في جهاز آخر",
+    btnDownloadJson: "⬇ تنزيل التقدم والبطاقات كملف JSON",
+    btnDownloadDb: "⬇ تنزيل قاعدة البيانات كاملة (SQLite)",
+    hdrPdf: "🖨 تصدير كـ PDF",
+    descPdf: "اختر نطاق البطاقات التي تريد تصديرها كملف PDF",
+    pdfAllCards: "كل البطاقات",
+    pdfByCat: "حسب التصنيف",
+    pdfByBook: "حسب الكتاب",
+    hdrRestore: "↩ استعادة نسخة SQLite محفوظة",
+    descRestore: "استرجاع قاعدة بيانات SQLite كاملة محفوظة مسبقًا من جهازك",
+    btnChooseSqlite: "اختيار ملف .sqlite",
+    hdrDanger: "⚠ منطقة الخطر",
+    descDanger: "هذا الإجراء لا يمكن التراجع عنه — تأكد من تنزيل نسخة احتياطية أولًا",
+    btnReset: "🗑 مسح جميع البيانات",
+    
+    actFollowing: "أطبق هذا المبدأ بانتظام",
+    actTrying: "أحاول تطبيقه",
+    actNextNew: "التالي / لا أطبقه بعد",
+    actUpdateNew: "تحديث: لا أطبقه بعد",
+    actEditCard: "✏️ تعديل البطاقة",
+    actDeleteCard: "🗑 حذف البطاقة",
+    actEditBtn: "✏️ تعديل",
+    actDeleteBtn: "🗑 حذف",
+    
+    lblActionableInsight: "💡 نصيحة قابلة للتطبيق",
+    lblTimesSeen: "شوهدت",
+    lblTimesUnit: "مرة",
+    lblLastReviewed: "آخر مراجعة:",
+    lblNeverReviewed: "لم تُراجع بعد",
+    lblAllCats: "كل التصنيفات",
+    lblAllBooks: "كل الكتب",
+    lblNoCardsMatch: "لا توجد بطاقات مطابقة",
+    lblDeckCardPos: "البطاقة {pos} من {total} (ضمن الفلتر الحالي)",
+    lblFeedShowing: "يعرض {total} بطاقة (تمرير عمودي)",
+    lblGridShowing: "يعرض {total} بطاقة (شبكة تفاعلية)",
+    lblFeedMore: "... و {count} بطاقة أخرى غير معروضة لتسريع الأداء.",
+    
+    statusNew: "لا أطبقه بعد",
+    statusTrying: "أحاول تطبيقه",
+    statusFollowing: "أطبق هذا المبدأ بانتظام"
+  },
+  en: {
+    docTitle: "Irteqa — Micro-Learning Cards",
+    brandTitle: "Irteqa",
+    brandGlyph: "I",
+    navImport: "📥 Import",
+    navLearn: "📖 Learn",
+    navDb: "🗂 Database",
+    heroTitle: "Transform Books into Knowledge Cards",
+    heroDesc: "Upload a JSON file containing micro-learning cards & progress. They will automatically be organized without duplicates in your local browser database.",
+    dropzoneTitle: "Drag and drop JSON file here",
+    dropzoneSub: "Or click to select from your device (.json)",
+    orText: "Or paste JSON text directly",
+    importBtn: "Import Cards & Progress",
+    addManualBtn: "➕ Add Card Manually",
+    sampleLink: "Load sample data for preview",
+    
+    optSingle: "🃏 Card by Card (Default)",
+    optFeed: "📜 Vertical Feed",
+    optGrid: "🔲 Interactive Grid",
+    stAll: "All Cards",
+    stNeedsAction: "In Learning Phase (New / Trying)",
+    stNew: "Not Applied Yet",
+    stTrying: "Trying to Apply",
+    stFollowing: "Applying Regularly",
+    phSearch: "🔍 Search cards...",
+    btnShuffle: "🔀 Smart Shuffle",
+    
+    lblTotal: "Total",
+    lblFollowing: "Applied",
+    lblTrying: "Trying",
+    lblNew: "Not Applied",
+    
+    stAllStatuses: "All Statuses",
+    lblDisplayMode: "Display Mode:",
+    vmSingle: "Card by Card",
+    vm20: "20 cards per page",
+    vm40: "40 cards per page",
+    vm60: "60 cards per page",
+    lblGroupBy: "Group By:",
+    gbNone: "No Grouping",
+    gbCat: "Category",
+    gbBook: "Book",
+    btnSelectMode: "☑ Multi-Select",
+    btnExportJson: "⬇ Export Progress JSON",
+    btnAddCard: "➕ Add Card",
+    
+    lblSelectedCards: "Cards Selected",
+    btnSelAll: "Select All on Page",
+    btnSelNone: "Deselect All",
+    btnExportPdf: "⬇ Export PDF",
+    btnDeleteSelected: "🗑 Delete Selected",
+    lblMatchingCards: "matching cards",
+    
+    btnLoadMore: "Loading More ⬇",
+    btnPrev: "◀ Previous",
+    btnNext: "Next ▶",
+    
+    titleAddCard: "Add Card",
+    titleEditCard: "Edit Card",
+    subAddCard: "Fill out the fields below and save",
+    lblBook: "Book",
+    lblCategory: "Category",
+    lblTopic: "Topic",
+    lblHeadline: "Headline",
+    lblTakeaway: "Main Takeaway",
+    lblInsight: "Actionable Insight",
+    phBook: "Book Title",
+    phCategory: "Main Category",
+    phTopic: "Subtopic",
+    phHeadline: "Card Title",
+    phTakeaway: "Core idea or summary",
+    phInsight: "Practical action step",
+    btnCancel: "Cancel",
+    btnSaveCard: "Save Card",
+    
+    settingsTitle: "⚙️ Settings",
+    settingsSub: "Language, Export, Import, and Database Management",
+    hdrLang: "🌐 Display Language",
+    descLang: "Choose your preferred learning language",
+    hdrExport: "📤 Export Data & Progress",
+    descExport: "Download your cards with full learning progress as a JSON file to transfer across devices",
+    btnDownloadJson: "⬇ Download Progress & Cards as JSON",
+    btnDownloadDb: "⬇ Download Full Database (SQLite)",
+    hdrPdf: "🖨 Export as PDF",
+    descPdf: "Select the scope of cards you wish to export to PDF",
+    pdfAllCards: "All Cards",
+    pdfByCat: "By Category",
+    pdfByBook: "By Book",
+    hdrRestore: "↩ Restore SQLite Backup",
+    descRestore: "Restore a previously saved full SQLite database file",
+    btnChooseSqlite: "Select .sqlite file",
+    hdrDanger: "⚠ Danger Zone",
+    descDanger: "This action cannot be undone — ensure you download a backup first",
+    btnReset: "🗑 Clear All Data",
+    
+    actFollowing: "Applying regularly",
+    actTrying: "Trying to apply",
+    actNextNew: "Next / Not applied yet",
+    actUpdateNew: "Update: Not applied yet",
+    actEditCard: "✏️ Edit Card",
+    actDeleteCard: "🗑 Delete Card",
+    actEditBtn: "✏️ Edit",
+    actDeleteBtn: "🗑 Delete",
+    
+    lblActionableInsight: "💡 Actionable Insight",
+    lblTimesSeen: "Seen",
+    lblTimesUnit: "times",
+    lblLastReviewed: "Last reviewed:",
+    lblNeverReviewed: "Never reviewed",
+    lblAllCats: "All Categories",
+    lblAllBooks: "All Books",
+    lblNoCardsMatch: "No matching cards found",
+    lblDeckCardPos: "Card {pos} of {total} (within current filter)",
+    lblFeedShowing: "Showing {total} cards (Vertical Feed)",
+    lblGridShowing: "Showing {total} cards (Interactive Grid)",
+    lblFeedMore: "... and {count} more cards hidden for performance.",
+    
+    statusNew: "Not Applied Yet",
+    statusTrying: "Trying to Apply",
+    statusFollowing: "Applying Regularly"
+  }
 };
+
+let currentLang = localStorage.getItem('irtiqa_lang') || 'ar';
+
+function getStatusLabels() {
+  return {
+    new: I18N[currentLang].statusNew,
+    trying: I18N[currentLang].statusTrying,
+    following: I18N[currentLang].statusFollowing
+  };
+}
 
 let SQL = null;
 let db = null;
@@ -629,55 +899,6 @@ const el = (id) => document.getElementById(id);
 const qs = (sel, root=document) => root.querySelector(sel);
 const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-/* ---------------------- TTS Logic ---------------------- */
-window.stopSpeech = function() {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        document.querySelectorAll('.tts-btn').forEach(b => {
-            b.innerHTML = '🔊';
-            b.dataset.playing = 'false';
-        });
-    }
-};
-
-window.toggleReadCard = function(btn, cardId) {
-    if (!('speechSynthesis' in window)) {
-        toast('عذراً، متصفحك لا يدعم القراءة الصوتية.');
-        return;
-    }
-    
-    // If the button clicked is already playing, stop the speech
-    if (btn.dataset.playing === 'true') {
-        stopSpeech();
-        return;
-    }
-
-    stopSpeech(); // Ensure previous speech is halted
-    
-    const card = getCardById(cardId);
-    if (!card) return;
-    
-    const textToRead = `${card.headline}... الفكرة الأساسية: ${card.takeaway}... نصيحة قابلة للتطبيق: ${card.actionable_insight}`;
-    const utterance = new SpeechSynthesisUtterance(textToRead);
-    
-    // Hint to use Arabic language (Windows will use its native Arabic voices like Microsoft Naayf or Hoda if available)
-    utterance.lang = 'ar-SA';
-    
-    utterance.onend = () => {
-        btn.innerHTML = '🔊';
-        btn.dataset.playing = 'false';
-    };
-    utterance.onerror = () => {
-        btn.innerHTML = '🔊';
-        btn.dataset.playing = 'false';
-    };
-    
-    btn.innerHTML = '⏹';
-    btn.dataset.playing = 'true';
-    window.speechSynthesis.speak(utterance);
-};
-
-
 let toastTimer;
 function toast(msg){
   const t = el('toast');
@@ -687,11 +908,47 @@ function toast(msg){
   toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
 }
 
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('irtiqa_lang', lang);
+  
+  document.documentElement.lang = lang;
+  document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  
+  el('langSelect').value = lang;
+
+  qsa('[data-i18n]').forEach(node => {
+    const key = node.dataset.i18n;
+    if (I18N[lang][key]) node.textContent = I18N[lang][key];
+  });
+  
+  qsa('[data-i18n-ph]').forEach(node => {
+    const key = node.dataset.i18nPh;
+    if (I18N[lang][key]) node.placeholder = I18N[lang][key];
+  });
+
+  el('docTitle').textContent = I18N[lang].docTitle;
+  el('brandTitle').textContent = I18N[lang].brandTitle;
+  el('brandGlyph').textContent = I18N[lang].brandGlyph;
+
+  if (db) {
+    refreshFilters();
+    refreshDbFilters();
+    renderStats();
+    if(el('view-learn').classList.contains('active')) renderLearnStage();
+    if(el('view-database').classList.contains('active')) applyDbFilters();
+  }
+}
+
+el('langSelect').addEventListener('change', (e) => {
+  setLanguage(e.target.value);
+});
+
 qsa('.navbtn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchView(btn.dataset.view));
 });
+
 function switchView(name){
-  stopSpeech(); // Stop playing when switching views
   qsa('.navbtn').forEach(b=> b.classList.toggle('active', b.dataset.view===name));
   qsa('.view').forEach(v=> v.classList.remove('active'));
   el('view-'+name).classList.add('active');
@@ -700,7 +957,7 @@ function switchView(name){
 }
 
 function openModal(id){ el(id).classList.add('show'); }
-function closeModal(id){ el(id).classList.remove('show'); stopSpeech(); }
+function closeModal(id){ el(id).classList.remove('show'); }
 el('settingsBtn').addEventListener('click', ()=>{ refreshPdfScopeOptions(); openModal('settingsModalBackdrop'); });
 el('settingsModalClose').addEventListener('click', ()=> closeModal('settingsModalBackdrop'));
 el('settingsModalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='settingsModalBackdrop') closeModal('settingsModalBackdrop'); });
@@ -787,17 +1044,22 @@ async function tryRestoreFromLocalStorage(){
 }
 
 window.addEventListener('load', async ()=>{
+  setLanguage(currentLang);
   const restored = await tryRestoreFromLocalStorage();
   if(!restored) await initDb();
+  refreshFilters();
+  refreshDbFilters();
 });
 
 function validateAndNormalize(json){
-  if(!Array.isArray(json)) throw new Error('يجب أن يكون الملف مصفوفة من البطاقات (Array).');
+  if(!Array.isArray(json)) throw new Error(currentLang === 'ar' ? 'يجب أن يكون الملف مصفوفة من البطاقات (Array).' : 'File must be a JSON array of cards.');
   const required = ['book_title','main_category','topic','headline','takeaway','actionable_insight'];
   return json.map((c, idx)=>{
     for(const key of required){
       if(typeof c[key] !== 'string' || !c[key].trim()){
-        throw new Error(`البطاقة رقم ${idx+1} تفتقد إلى حقل "${key}" أو أنه فارغ.`);
+        throw new Error(currentLang === 'ar' 
+          ? `البطاقة رقم ${idx+1} تفتقد إلى حقل "${key}" أو أنه فارغ.` 
+          : `Card #${idx+1} is missing required field "${key}".`);
       }
     }
     return {
@@ -806,7 +1068,10 @@ function validateAndNormalize(json){
       topic: c.topic.trim(),
       headline: c.headline.trim(),
       takeaway: c.takeaway.trim(),
-      actionable_insight: c.actionable_insight.trim()
+      actionable_insight: c.actionable_insight.trim(),
+      status: ['new', 'trying', 'following'].includes(c.status) ? c.status : 'new',
+      times_seen: typeof c.times_seen === 'number' ? c.times_seen : 0,
+      last_reviewed: c.last_reviewed || null
     };
   });
 }
@@ -814,7 +1079,7 @@ function validateAndNormalize(json){
 async function importCards(cards){
   if(!db) await initDb();
   const insertCard = db.prepare(`INSERT OR IGNORE INTO cards (book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?)`);
-  const insertProgress = db.prepare(`INSERT INTO progress (card_id, status, times_seen) VALUES (?, 'new', 0)`);
+  const insertProgress = db.prepare(`INSERT OR REPLACE INTO progress (card_id, status, times_seen, last_reviewed) VALUES (?, ?, ?, ?)`);
   db.run('BEGIN TRANSACTION');
   let addedCount = 0;
   let duplicateCount = 0;
@@ -824,13 +1089,18 @@ async function importCards(cards){
       const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [c.book_title, c.headline]);
       if(existing.length > 0) {
           duplicateCount++;
+          const targetId = existing[0].id;
+          if (c.status || c.times_seen || c.last_reviewed) {
+             dbRun(`UPDATE progress SET status=?, times_seen=?, last_reviewed=? WHERE card_id=?`, 
+               [c.status || 'new', c.times_seen || 0, c.last_reviewed || null, targetId]);
+          }
           continue; 
       }
 
       insertCard.run([c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight]);
       const idRow = dbExec('SELECT last_insert_rowid() as id');
       const newId = idRow[0].id;
-      insertProgress.run([newId]);
+      insertProgress.run([newId, c.status || 'new', c.times_seen || 0, c.last_reviewed || null]);
       addedCount++;
     }
     db.run('COMMIT');
@@ -852,12 +1122,12 @@ function setImportStatus(msg, cls){
 }
 
 async function handleJsonText(text){
-  setImportStatus('جاري التحقق من البيانات...', '');
+  setImportStatus(currentLang === 'ar' ? 'جاري التحقق من البيانات...' : 'Validating data...', '');
   let parsed;
   try{
     parsed = JSON.parse(text);
   }catch(e){
-    setImportStatus('⚠ تعذّر تحليل JSON. تأكد من صحة تنسيق الملف.', 'err');
+    setImportStatus(currentLang === 'ar' ? '⚠ تعذّر تحليل JSON. تأكد من صحة تنسيق الملف.' : '⚠ Failed to parse JSON. Check format.', 'err');
     return;
   }
   try{
@@ -865,14 +1135,18 @@ async function handleJsonText(text){
     const res = await importCards(cards);
     
     if (res.added === 0 && res.duplicates > 0) {
-      setImportStatus(`ℹ️ تم تجاهل ${res.duplicates} بطاقة لأنها موجودة مسبقًا في قاعدة البيانات.`, 'ok');
+      setImportStatus(currentLang === 'ar' 
+        ? `ℹ️ تم تحديث ${res.duplicates} بطاقة/تقدم مسبق الوجود.` 
+        : `ℹ️ Updated ${res.duplicates} existing cards/progress records.`, 'ok');
     } else if (res.duplicates > 0) {
-      setImportStatus(`✅ تم استيراد ${res.added} بطاقة وتجاهل ${res.duplicates} بطاقة مكررة.`, 'ok');
-      toast(`تمت إضافة ${res.added} بطاقة`);
+      setImportStatus(currentLang === 'ar' 
+        ? `✅ تم استيراد ${res.added} بطاقة وتحديث ${res.duplicates} بطاقة مسبقة.` 
+        : `✅ Imported ${res.added} new cards, updated ${res.duplicates} existing.`, 'ok');
+      toast(currentLang === 'ar' ? `تمت إضافة ${res.added} بطاقة` : `Added ${res.added} cards`);
       setTimeout(()=> switchView('learn'), 1200);
     } else {
-      setImportStatus(`✅ تم استيراد ${res.added} بطاقة جديدة بنجاح!`, 'ok');
-      toast(`تمت إضافة ${res.added} بطاقة إلى مكتبتك`);
+      setImportStatus(currentLang === 'ar' ? `✅ تم استيراد ${res.added} بطاقة جديدة بنجاح!` : `✅ Successfully imported ${res.added} new cards!`, 'ok');
+      toast(currentLang === 'ar' ? `تمت إضافة ${res.added} بطاقة إلى مكتبتك` : `Added ${res.added} cards to library`);
       setTimeout(()=> switchView('learn'), 800);
     }
   }catch(e){
@@ -882,7 +1156,7 @@ async function handleJsonText(text){
 
 el('importBtn').addEventListener('click', async ()=>{
   const text = el('pasteArea').value.trim();
-  if(!text){ setImportStatus('⚠ الرجاء رفع ملف أو لصق نص JSON أولاً.', 'err'); return; }
+  if(!text){ setImportStatus(currentLang === 'ar' ? '⚠ الرجاء رفع ملف أو لصق نص JSON أولاً.' : '⚠ Please upload or paste JSON text first.', 'err'); return; }
   await handleJsonText(text);
 });
 
@@ -891,7 +1165,8 @@ el('dbAddCardBtn').addEventListener('click', ()=>{ openCardModal(); });
 
 function openCardModal(cardId = null){
   editingCardId = cardId;
-  el('cardModalTitle').textContent = cardId ? 'تعديل البطاقة' : 'إضافة بطاقة';
+  const labels = I18N[currentLang];
+  el('cardModalTitle').textContent = cardId ? labels.titleEditCard : labels.titleAddCard;
   
   if(cardId){
     const c = getCardById(cardId);
@@ -921,27 +1196,27 @@ function openCardModal(cardId = null){
 
 el('cardModalSave').addEventListener('click', ()=>{
   const data = {
-    book_title: el('fBook').value.trim() || 'بدون كتاب',
-    main_category: el('fCategory').value.trim() || 'عام',
-    topic: el('fTopic').value.trim() || 'عام',
+    book_title: el('fBook').value.trim() || (currentLang==='ar'?'بدون كتاب':'Uncategorized'),
+    main_category: el('fCategory').value.trim() || (currentLang==='ar'?'عام':'General'),
+    topic: el('fTopic').value.trim() || (currentLang==='ar'?'عام':'General'),
     headline: el('fHeadline').value.trim(),
     takeaway: el('fTakeaway').value.trim(),
     actionable_insight: el('fInsight').value.trim()
   };
   
   if(!data.headline || !data.takeaway){
-    alert('الرجاء إدخال العنوان والفكرة الأساسية على الأقل.');
+    alert(currentLang === 'ar' ? 'الرجاء إدخال العنوان والفكرة الأساسية على الأقل.' : 'Please enter at least a headline and takeaway.');
     return;
   }
 
   if(editingCardId){
     dbRun(`UPDATE cards SET book_title=?, main_category=?, topic=?, headline=?, takeaway=?, actionable_insight=? WHERE id=?`, 
       [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight, editingCardId]);
-    toast('✅ تم تحديث البطاقة');
+    toast(currentLang==='ar'?'✅ تم تحديث البطاقة':'✅ Card updated');
   } else {
     const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [data.book_title, data.headline]);
     if(existing.length > 0) {
-      alert('هذه البطاقة موجودة مسبقًا في قاعدة البيانات!');
+      alert(currentLang==='ar'?'هذه البطاقة موجودة مسبقًا في قاعدة البيانات!':'This card already exists in the database!');
       return;
     }
 
@@ -949,7 +1224,7 @@ el('cardModalSave').addEventListener('click', ()=>{
       [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight]);
     const newId = dbExec('SELECT last_insert_rowid() as id')[0].id;
     dbRun(`INSERT INTO progress (card_id, status, times_seen) VALUES (?, 'new', 0)`, [newId]);
-    toast('✅ تمت الإضافة بنجاح');
+    toast(currentLang==='ar'?'✅ تمت الإضافة بنجاح':'✅ Card added successfully');
   }
   
   persist();
@@ -974,15 +1249,15 @@ el('fileInput').addEventListener('change', e=>{
 function readFileAsText(file){
   const reader = new FileReader();
   reader.onload = async ()=>{ el('pasteArea').value = reader.result; await handleJsonText(reader.result); };
-  reader.onerror = ()=> setImportStatus('⚠ تعذّرت قراءة الملف.', 'err');
+  reader.onerror = ()=> setImportStatus(currentLang==='ar'?'⚠ تعذّرت قراءة الملف.':'⚠ Failed to read file.', 'err');
   reader.readAsText(file, 'utf-8');
 }
 
 el('sampleLink').addEventListener('click', async ()=>{
   const sample = [
-    { book_title:"العادات الذرية", main_category:"الإنتاجية", topic:"بناء العادات", headline:"التحسّن 1% يوميًا يغيّر مسارك بالكامل", takeaway:"النتائج الكبيرة لا تأتي من تغييرات جذرية، بل من تراكم تحسينات صغيرة يوميًا مع مرور الوقت.", actionable_insight:"اختر عادة واحدة صغيرة اليوم والتزم بتطبيقها لمدة 5 دقائق فقط، دون انقطاع لمدة أسبوع." },
-    { book_title:"العادات الذرية", main_category:"التفكير والتطوير الذاتي", topic:"الهوية والسلوك", headline:"غيّر هويتك قبل أن تغيّر سلوكك", takeaway:"العادات المستدامة تنبع من تغيير نظرتك لذاتك، وليس فقط من تحديد أهداف خارجية.", actionable_insight:"بدل قول 'أحاول الجري'، قل 'أنا عدّاء' وتصرف بناءً على هذه الهوية الجديدة." },
-    { book_title:"فن اللامبالاة", main_category:"علم النفس", topic:"إدارة القيم", headline:"لا يمكنك أن تهتم بكل شيء دون أن تفقد نفسك", takeaway:"اختيار ما تهتم به بعناية أهم من محاولة الاهتمام بكل شيء من حولك.", actionable_insight:"اكتب اليوم قائمة بثلاث قيم فقط تريد التركيز عليها هذا الشهر، وتجاهل الباقي بوعي." }
+    { book_title:"Atomic Habits", main_category:"Productivity", topic:"Habit Formation", headline:"1% Improvement Every Day", takeaway:"Small daily improvements compound into massive results over time.", actionable_insight:"Choose one tiny habit today and perform it for just 5 minutes daily for a week.", status:"new", times_seen:0 },
+    { book_title:"Atomic Habits", main_category:"Self Improvement", topic:"Identity & Behavior", headline:"Change Your Identity First", takeaway:"True behavior change is identity change. You align habits with who you believe you are.", actionable_insight:"Instead of saying 'I am trying to run', say 'I am a runner' and act accordingly.", status:"trying", times_seen:2 },
+    { book_title:"The Subtle Art", main_category:"Psychology", topic:"Values", headline:"Choose What Matters", takeaway:"You cannot care about everything without exhausting yourself. Select your values wisely.", actionable_insight:"Write down 3 core values for this month and consciously ignore non-essentials.", status:"following", times_seen:5 }
   ];
   el('pasteArea').value = JSON.stringify(sample, null, 2);
   await handleJsonText(el('pasteArea').value);
@@ -990,14 +1265,15 @@ el('sampleLink').addEventListener('click', async ()=>{
 
 function refreshFilters(){
   if(!db) return;
+  const labels = I18N[currentLang];
   const catSel = el('filterCategory');
   const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
-  catSel.innerHTML = '<option value="all">كل التصنيفات</option>' +
+  catSel.innerHTML = `<option value="all">${labels.lblAllCats}</option>` +
     cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
 
   const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
   const bookSel = el('filterBook');
-  bookSel.innerHTML = '<option value="all">كل الكتب</option>' +
+  bookSel.innerHTML = `<option value="all">${labels.lblAllBooks}</option>` +
     books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
 }
 
@@ -1023,11 +1299,10 @@ el('searchInput').addEventListener('input', ()=>{
 });
 el('shuffleBtn').addEventListener('click', ()=>{
   applyFilters(true);
-  toast('تم ترتيب البطاقات بذكاء');
+  toast(currentLang==='ar'?'تم ترتيب البطاقات بذكاء':'Smart shuffled cards');
 });
 
 function applyFilters(shuffle = false){
-  stopSpeech();
   if(!db){ currentDeck = []; renderLearnStage(); renderStats(); return; }
   const cat = el('filterCategory').value;
   const book = el('filterBook').value;
@@ -1091,48 +1366,53 @@ function getCardById(id){
 }
 
 function generateBigCardHTML(card, mode) {
+  const statusLabels = getStatusLabels();
+  const labels = I18N[currentLang];
   const statusClass = card.status;
   let actionButtons = '';
   
   if (mode === 'single') {
      actionButtons = `
-       <button class="act-btn following" onclick="handleLearnAction(${card.id}, 'following', true)"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
-       <button class="act-btn trying" onclick="handleLearnAction(${card.id}, 'trying', true)"><span class="ic">🔖</span>أحاول تطبيقه</button>
-       <button class="act-btn new" onclick="handleLearnAction(${card.id}, 'new', false)"><span class="ic">➡️</span>التالي / لا أطبقه بعد</button>
+       <button class="act-btn following" onclick="handleLearnAction(${card.id}, 'following', true)"><span class="ic">✅</span>${labels.actFollowing}</button>
+       <button class="act-btn trying" onclick="handleLearnAction(${card.id}, 'trying', true)"><span class="ic">🔖</span>${labels.actTrying}</button>
+       <button class="act-btn new" onclick="handleLearnAction(${card.id}, 'new', false)"><span class="ic">➡️</span>${labels.actNextNew}</button>
      `;
   } else if (mode === 'feed') {
      actionButtons = `
-       <button class="act-btn following" onclick="handleLearnFeedAction(${card.id}, 'following', this)"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
-       <button class="act-btn trying" onclick="handleLearnFeedAction(${card.id}, 'trying', this)"><span class="ic">🔖</span>أحاول تطبيقه</button>
-       <button class="act-btn new" onclick="handleLearnFeedAction(${card.id}, 'new', this)"><span class="ic">➡️</span>التالي / لا أطبقه بعد</button>
+       <button class="act-btn following" onclick="handleLearnFeedAction(${card.id}, 'following', this)"><span class="ic">✅</span>${labels.actFollowing}</button>
+       <button class="act-btn trying" onclick="handleLearnFeedAction(${card.id}, 'trying', this)"><span class="ic">🔖</span>${labels.actTrying}</button>
+       <button class="act-btn new" onclick="handleLearnFeedAction(${card.id}, 'new', this)"><span class="ic">➡️</span>${labels.actNextNew}</button>
      `;
   } else if (mode === 'modal') {
      actionButtons = `
-       <button class="act-btn following" onclick="handleLearnModalAction(${card.id}, 'following')"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
-       <button class="act-btn trying" onclick="handleLearnModalAction(${card.id}, 'trying')"><span class="ic">🔖</span>أحاول تطبيقه</button>
-       <button class="act-btn new" onclick="handleLearnModalAction(${card.id}, 'new')"><span class="ic">➡️</span>تحديث: لا أطبقه بعد</button>
+       <button class="act-btn following" onclick="handleLearnModalAction(${card.id}, 'following')"><span class="ic">✅</span>${labels.actFollowing}</button>
+       <button class="act-btn trying" onclick="handleLearnModalAction(${card.id}, 'trying')"><span class="ic">🔖</span>${labels.actTrying}</button>
+       <button class="act-btn new" onclick="handleLearnModalAction(${card.id}, 'new')"><span class="ic">➡️</span>${labels.actUpdateNew}</button>
      `;
   }
+
+  const dateFormatted = card.last_reviewed 
+    ? new Date(card.last_reviewed).toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : 'en-US')
+    : labels.lblNeverReviewed;
 
   return `
     <div class="lcard-wrapper" id="lcard-wrap-${card.id}">
       <div class="lcard">
-        <button class="tts-btn" onclick="toggleReadCard(this, ${card.id})" title="استمع للبطاقة" data-playing="false">🔊</button>
         <div class="badges">
           <span class="badge cat">${escapeHtml(card.main_category)}</span>
           <span class="badge book">📚 ${escapeHtml(card.book_title)}</span>
-          <span class="badge status ${statusClass}">${escapeHtml(STATUS_LABELS[card.status] || card.status)}</span>
+          <span class="badge status ${statusClass}">${escapeHtml(statusLabels[card.status] || card.status)}</span>
         </div>
         <div class="topic">${escapeHtml(card.topic)}</div>
         <h3 class="headline">${escapeHtml(card.headline)}</h3>
         <p class="takeaway">${escapeHtml(card.takeaway)}</p>
         <div class="insight-box">
-          <span class="lbl">💡 نصيحة قابلة للتطبيق</span>
+          <span class="lbl">${labels.lblActionableInsight}</span>
           <p>${escapeHtml(card.actionable_insight)}</p>
         </div>
         <div class="meta-row">
-          <span>👁 شوهدت ${card.times_seen || 0} مرة</span>
-          <span>${card.last_reviewed ? 'آخر مراجعة: ' + new Date(card.last_reviewed).toLocaleDateString('ar-EG') : 'لم تُراجع بعد'}</span>
+          <span>👁 ${labels.lblTimesSeen} ${card.times_seen || 0} ${labels.lblTimesUnit}</span>
+          <span>${labels.lblLastReviewed} ${dateFormatted}</span>
         </div>
       </div>
       <div class="card-actions">${actionButtons}</div>
@@ -1142,12 +1422,14 @@ function generateBigCardHTML(card, mode) {
 
 function renderLearnStage(){
   const stage = el('cardStage');
+  const labels = I18N[currentLang];
+
   if(!currentDeck.length){
     stage.innerHTML = `
       <div class="empty-state">
         <div class="ic">🗂️</div>
-        <h3>لا توجد بطاقات مطابقة</h3>
-        <p>${db && dbExec('SELECT COUNT(*) as n FROM cards')[0].n ? 'جرّب تعديل الفلاتر أو البحث.' : 'ابدأ باستيراد بطاقاتك من واجهة الاستيراد.'}</p>
+        <h3>${labels.lblNoCardsMatch}</h3>
+        <p>${db && dbExec('SELECT COUNT(*) as n FROM cards')[0].n ? (currentLang==='ar'?'جرّب تعديل الفلاتر أو البحث.':'Try adjusting filters or search.') : (currentLang==='ar'?'ابدأ باستيراد بطاقاتك من واجهة الاستيراد.':'Start importing cards from the Import view.')}</p>
       </div>`;
     el('deckIndex').textContent = '';
     return;
@@ -1157,29 +1439,30 @@ function renderLearnStage(){
      if(deckPos >= currentDeck.length) deckPos = 0; 
      const card = getCardById(currentDeck[deckPos]);
      stage.innerHTML = generateBigCardHTML(card, 'single');
-     el('deckIndex').textContent = `البطاقة ${deckPos+1} من ${currentDeck.length} (ضمن الفلتر الحالي)`;
+     el('deckIndex').textContent = labels.lblDeckCardPos.replace('{pos}', deckPos+1).replace('{total}', currentDeck.length);
   } 
   else if (learnViewMode === 'feed') {
-     el('deckIndex').textContent = `يعرض ${currentDeck.length} بطاقة (تمرير عمودي)`;
+     el('deckIndex').textContent = labels.lblFeedShowing.replace('{total}', currentDeck.length);
      let html = '<div class="feed-wrap">';
      const limit = Math.min(currentDeck.length, 100);
      for(let i=0; i<limit; i++) {
         html += generateBigCardHTML(getCardById(currentDeck[i]), 'feed');
      }
-     if (currentDeck.length > 100) html += `<div style="text-align:center;color:#7f8ea3;margin-top:20px;">... و ${currentDeck.length - 100} بطاقة أخرى غير معروضة في التمرير لتسريع الأداء.</div>`;
+     if (currentDeck.length > 100) html += `<div style="text-align:center;color:#7f8ea3;margin-top:20px;">${labels.lblFeedMore.replace('{count}', currentDeck.length - 100)}</div>`;
      html += '</div>';
      stage.innerHTML = html;
   }
   else if (learnViewMode === 'grid') {
-     el('deckIndex').textContent = `يعرض ${currentDeck.length} بطاقة (شبكة تفاعلية)`;
+     const statusLabels = getStatusLabels();
+     el('deckIndex').textContent = labels.lblGridShowing.replace('{total}', currentDeck.length);
      let html = '<div class="grid-wrap">';
      const limit = Math.min(currentDeck.length, 150);
      for(let i=0; i<limit; i++) {
         const c = getCardById(currentDeck[i]);
         html += `
           <div class="tile learn-tile" id="learn-tile-${c.id}" onclick="openLearnModal(${c.id})">
-            <div class="tile-badges" style="padding-left:0; padding-bottom:10px;">
-              <span class="tile-badge status ${c.status}">${STATUS_LABELS[c.status]}</span>
+            <div class="tile-badges">
+              <span class="tile-badge status ${c.status}">${statusLabels[c.status]}</span>
               <span class="tile-badge">${escapeHtml(c.main_category)}</span>
             </div>
             <h4>${escapeHtml(c.headline)}</h4>
@@ -1197,9 +1480,10 @@ window.handleLearnAction = function(id, status, isPositiveFeedback) {
 };
 
 window.handleLearnFeedAction = function(id, status, btnEl) {
+  const statusLabels = getStatusLabels();
   markCard(id, status, true, false); 
-  if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
-  else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+  if(status === 'following') toast(currentLang==='ar'?'✅ رائع! سيظهر هذا المبدأ بشكل أقل':'✅ Great! Card marked as followed.');
+  else if(status === 'trying') toast(currentLang==='ar'?'🔖 ممتاز، استمر بالمحاولة!':'🔖 Marked as trying!');
 
   const wrap = btnEl.closest('.lcard-wrapper');
   if(wrap) {
@@ -1207,7 +1491,7 @@ window.handleLearnFeedAction = function(id, status, btnEl) {
     const badge = wrap.querySelector('.badge.status');
     if(badge) {
        badge.className = `badge status ${status}`;
-       badge.textContent = STATUS_LABELS[status];
+       badge.textContent = statusLabels[status];
     }
   }
 };
@@ -1220,17 +1504,18 @@ window.openLearnModal = function(id) {
 };
 
 window.handleLearnModalAction = function(id, status) {
+  const statusLabels = getStatusLabels();
   markCard(id, status, true, false);
   closeModal('learnModalBackdrop');
-  if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
-  else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+  if(status === 'following') toast(currentLang==='ar'?'✅ رائع! سيظهر هذا المبدأ بشكل أقل':'✅ Great! Card marked as followed.');
+  else if(status === 'trying') toast(currentLang==='ar'?'🔖 ممتاز، استمر بالمحاولة!':'🔖 Marked as trying!');
   
   const tile = el(`learn-tile-${id}`);
   if(tile) {
       const badge = tile.querySelector('.tile-badge.status');
       if(badge) {
          badge.className = `tile-badge status ${status}`;
-         badge.textContent = STATUS_LABELS[status];
+         badge.textContent = statusLabels[status];
       }
   }
 };
@@ -1241,8 +1526,8 @@ function markCard(id, status, silent = false, autoNext = true){
   persist();
   
   if(!silent) {
-    if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
-    else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+    if(status === 'following') toast(currentLang==='ar'?'✅ رائع! سيظهر هذا المبدأ بشكل أقل':'✅ Great! Marked as applied.');
+    else if(status === 'trying') toast(currentLang==='ar'?'🔖 ممتاز، استمر بالمحاولة!':'🔖 Marked as trying!');
   }
   
   renderStats();
@@ -1250,10 +1535,9 @@ function markCard(id, status, silent = false, autoNext = true){
 }
 
 function goNext() {
-  stopSpeech(); // Stop reading audio if user clicked to view next card
   deckPos++;
   if(deckPos >= currentDeck.length) {
-    toast("لقد أكملت مجموعة البطاقات الحالية! سنبدأ من جديد.");
+    toast(currentLang==='ar'?"لقد أكملت مجموعة البطاقات الحالية! سنبدأ من جديد.":"Reached end of deck! Starting over.");
     deckPos = 0;
   }
   renderLearnStage();
@@ -1261,14 +1545,15 @@ function goNext() {
 
 function refreshDbFilters(){
   if(!db) return;
+  const labels = I18N[currentLang];
   const catSel = el('dbFilterCategory');
   const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
-  catSel.innerHTML = '<option value="all">كل التصنيفات</option>' +
+  catSel.innerHTML = `<option value="all">${labels.lblAllCats}</option>` +
     cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
 
   const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
   const bookSel = el('dbFilterBook');
-  bookSel.innerHTML = '<option value="all">كل الكتب</option>' +
+  bookSel.innerHTML = `<option value="all">${labels.lblAllBooks}</option>` +
     books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
 }
 
@@ -1282,7 +1567,6 @@ el('dbSearchInput').addEventListener('input', ()=>{
 });
 
 function applyDbFilters(){
-  stopSpeech();
   if(!db){ dbDeck = []; renderDbContent(); return; }
   const cat = el('dbFilterCategory').value;
   const book = el('dbFilterBook').value;
@@ -1324,7 +1608,9 @@ function applyDbFilters(){
 function getCardHTML(card, asTile=true){
   const selCls = selectedIds.has(card.id) ? 'selected' : '';
   const statusClass = card.status;
-  const statusLbl = STATUS_LABELS[card.status] || card.status;
+  const statusLabels = getStatusLabels();
+  const labels = I18N[currentLang];
+  const statusLbl = statusLabels[card.status] || card.status;
   
   if(asTile){
     return `
@@ -1337,15 +1623,14 @@ function getCardHTML(card, asTile=true){
         <h4>${escapeHtml(card.headline)}</h4>
         <p class="snip">${escapeHtml(card.takeaway)}</p>
         <div class="tile-actions">
-          <button onclick="event.stopPropagation(); openCardModal(${card.id});">✏️ تعديل</button>
-          <button class="del" onclick="event.stopPropagation(); deleteCard(${card.id});">🗑 حذف</button>
+          <button onclick="event.stopPropagation(); openCardModal(${card.id});">${labels.actEditBtn}</button>
+          <button class="del" onclick="event.stopPropagation(); deleteCard(${card.id});">${labels.actDeleteBtn}</button>
         </div>
       </div>
     `;
   } else {
     return `
       <div class="lcard" style="margin:0 auto; display:block;">
-        <button class="tts-btn" onclick="toggleReadCard(this, ${card.id})" title="استمع للبطاقة" data-playing="false">🔊</button>
         <div class="badges">
           <span class="badge cat">${escapeHtml(card.main_category)}</span>
           <span class="badge book">📚 ${escapeHtml(card.book_title)}</span>
@@ -1355,12 +1640,12 @@ function getCardHTML(card, asTile=true){
         <h3 class="headline">${escapeHtml(card.headline)}</h3>
         <p class="takeaway">${escapeHtml(card.takeaway)}</p>
         <div class="insight-box">
-          <span class="lbl">💡 نصيحة قابلة للتطبيق</span>
+          <span class="lbl">${labels.lblActionableInsight}</span>
           <p>${escapeHtml(card.actionable_insight)}</p>
         </div>
         <div class="card-actions" style="margin-top:16px;">
-          <button class="act-btn" style="border: 1px solid var(--line)" onclick="openCardModal(${card.id})">✏️ تعديل البطاقة</button>
-          <button class="act-btn" style="border: 1px solid var(--rose); color:var(--rose);" onclick="deleteCard(${card.id})">🗑 حذف البطاقة</button>
+          <button class="act-btn" style="border: 1px solid var(--line)" onclick="openCardModal(${card.id})">${labels.actEditCard}</button>
+          <button class="act-btn" style="border: 1px solid var(--rose); color:var(--rose);" onclick="deleteCard(${card.id})">${labels.actDeleteCard}</button>
         </div>
       </div>
     `;
@@ -1368,11 +1653,12 @@ function getCardHTML(card, asTile=true){
 }
 
 function renderDbGrid(append=false){
+  const labels = I18N[currentLang];
   el('loadMoreWrap').style.display = 'none';
   el('singleNavWrap').style.display = 'none';
   
   if(!dbDeck.length){
-    if(!append) el('dbContent').innerHTML = '<div class="empty-state">لا توجد بطاقات مطابقة</div>';
+    if(!append) el('dbContent').innerHTML = `<div class="empty-state">${labels.lblNoCardsMatch}</div>`;
     return;
   }
   
@@ -1433,10 +1719,11 @@ function renderGroupedSlice(start, end){
 }
 
 function renderDbSingle(){
+  const labels = I18N[currentLang];
   el('loadMoreWrap').style.display = 'none';
   
   if(!dbDeck.length){
-    el('dbContent').innerHTML = '<div class="empty-state">لا توجد بطاقات مطابقة</div>';
+    el('dbContent').innerHTML = `<div class="empty-state">${labels.lblNoCardsMatch}</div>`;
     el('singleNavWrap').style.display = 'none';
     return;
   }
@@ -1445,13 +1732,13 @@ function renderDbSingle(){
   el('dbContent').innerHTML = getCardHTML(c, false);
   
   el('singleNavWrap').style.display = 'flex';
-  el('singlePosLabel').textContent = `${dbSinglePos + 1} من ${dbDeck.length}`;
+  el('singlePosLabel').textContent = `${dbSinglePos + 1} / ${dbDeck.length}`;
   el('singlePrevBtn').disabled = (dbSinglePos === 0);
   el('singleNextBtn').disabled = (dbSinglePos === dbDeck.length - 1);
 }
 
-el('singlePrevBtn').addEventListener('click', ()=>{ if(dbSinglePos > 0){ stopSpeech(); dbSinglePos--; renderDbSingle(); } });
-el('singleNextBtn').addEventListener('click', ()=>{ if(dbSinglePos < dbDeck.length-1){ stopSpeech(); dbSinglePos++; renderDbSingle(); } });
+el('singlePrevBtn').addEventListener('click', ()=>{ if(dbSinglePos > 0){ dbSinglePos--; renderDbSingle(); } });
+el('singleNextBtn').addEventListener('click', ()=>{ if(dbSinglePos < dbDeck.length-1){ dbSinglePos++; renderDbSingle(); } });
 el('loadMoreBtn').addEventListener('click', ()=>{ renderDbGrid(true); });
 
 const loadMoreObserver = new IntersectionObserver(entries => {
@@ -1509,15 +1796,15 @@ el('selNoneBtn').addEventListener('click', ()=>{
 });
 
 async function deleteCard(id){
-  if(!confirm('هل أنت متأكد من حذف هذه البطاقة؟')) return;
+  if(!confirm(currentLang==='ar'?'هل أنت متأكد من حذف هذه البطاقة؟':'Are you sure you want to delete this card?')) return;
   dbRun('DELETE FROM progress WHERE card_id=?', [id]);
   dbRun('DELETE FROM cards WHERE id=?', [id]);
   persist();
   applyDbFilters();
-  toast('تم حذف البطاقة');
+  toast(currentLang==='ar'?'تم حذف البطاقة':'Card deleted');
 }
 el('selDeleteBtn').addEventListener('click', ()=>{
-  if(selectedIds.size===0 || !confirm(`حذف ${selectedIds.size} بطاقة؟`)) return;
+  if(selectedIds.size===0 || !confirm(currentLang==='ar'?`حذف ${selectedIds.size} بطاقة؟`:`Delete ${selectedIds.size} cards?`)) return;
   const ids = Array.from(selectedIds);
   db.run('BEGIN TRANSACTION');
   ids.forEach(id=>{
@@ -1528,9 +1815,8 @@ el('selDeleteBtn').addEventListener('click', ()=>{
   persist();
   exitSelectMode();
   applyDbFilters();
-  toast('تم الحذف بنجاح');
+  toast(currentLang==='ar'?'تم الحذف بنجاح':'Deleted successfully');
 });
-
 
 function refreshPdfScopeOptions(){
   if(!db) return;
@@ -1565,7 +1851,7 @@ el('pdfExportScopeBtn').addEventListener('click', ()=>{
 });
 
 el('selExportPdfBtn').addEventListener('click', ()=>{
-  if(selectedIds.size===0){ toast('لم يتم تحديد شيء'); return; }
+  if(selectedIds.size===0){ toast(currentLang==='ar'?'لم يتم تحديد شيء':'Nothing selected'); return; }
   const ids = Array.from(selectedIds);
   const cards = ids.map(id=> getCardById(id));
   doPdfPrint(cards);
@@ -1574,7 +1860,7 @@ el('selExportPdfBtn').addEventListener('click', ()=>{
 
 function doPdfPrint(cards){
   const wrap = el('printArea');
-  if(cards.length === 0){ toast('لا توجد بطاقات للتصدير'); return; }
+  if(cards.length === 0){ toast(currentLang==='ar'?'لا توجد بطاقات للتصدير':'No cards to export'); return; }
   
   let html = '';
   for(const c of cards){
@@ -1585,7 +1871,7 @@ function doPdfPrint(cards){
         <div class="p-topic">${escapeHtml(c.topic)}</div>
         <div class="p-take">${escapeHtml(c.takeaway)}</div>
         <div class="p-insight">
-          <b>خطوة عملية:</b>
+          <b>${currentLang==='ar'?'خطوة عملية:':'Action step:'}</b>
           ${escapeHtml(c.actionable_insight)}
         </div>
       </div>
@@ -1595,22 +1881,25 @@ function doPdfPrint(cards){
   window.print();
 }
 
-// JSON Export function that seamlessly generates a JSON array matching the import schema
 function exportAllToJson() {
   if(!db) return;
   
-  // We ONLY fetch the exact columns required for importing, skipping internal IDs and progress statuses.
-  const rows = dbExec('SELECT book_title, main_category, topic, headline, takeaway, actionable_insight FROM cards');
+  const rows = dbExec(`
+    SELECT c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight,
+           p.status, p.times_seen, p.last_reviewed
+    FROM cards c 
+    JOIN progress p ON p.card_id = c.id
+  `);
   
   if(rows.length === 0) { 
-      toast('لا توجد بطاقات لتصديرها'); 
+      toast(currentLang==='ar'?'لا توجد بطاقات لتصديرها':'No cards to export'); 
       return; 
   }
   
   const blob = new Blob([JSON.stringify(rows, null, 2)], {type: 'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `irtiqa_cards_${new Date().toISOString().slice(0,10)}.json`;
+  a.download = `irtiqa_progress_${new Date().toISOString().slice(0,10)}.json`;
   a.click();
 }
 
@@ -1636,7 +1925,7 @@ el('dbFileInput').addEventListener('change', e=>{
     const bytes = new Uint8Array(reader.result);
     db = new SQL.Database(bytes);
     persist();
-    toast('✅ تم استعادة قاعدة البيانات');
+    toast(currentLang==='ar'?'✅ تم استعادة قاعدة البيانات':'✅ Database restored');
     closeModal('settingsModalBackdrop');
     if(el('view-database').classList.contains('active')) applyDbFilters();
     if(el('view-learn').classList.contains('active')) applyFilters();
@@ -1645,12 +1934,12 @@ el('dbFileInput').addEventListener('change', e=>{
 });
 
 el('resetBtn').addEventListener('click', async ()=>{
-  if(!confirm('تحذير: سيتم مسح كل شيء بشكل نهائي! هل أنت متأكد؟')) return;
+  if(!confirm(currentLang==='ar'?'تحذير: سيتم مسح كل شيء بشكل نهائي! هل أنت متأكد؟':'Warning: All data will be permanently cleared! Are you sure?')) return;
   localStorage.removeItem('irtiqa_db');
-  localStorage.removeItem('mirqat_db'); // Clear old reference too
+  localStorage.removeItem('mirqat_db');
   db = null;
   await initDb();
-  toast('تم تفريغ قاعدة البيانات');
+  toast(currentLang==='ar'?'تم تفريغ قاعدة البيانات':'Database cleared');
   closeModal('settingsModalBackdrop');
   applyFilters();
   applyDbFilters();
