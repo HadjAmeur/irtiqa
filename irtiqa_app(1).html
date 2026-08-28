@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ارتقاء — بطاقات المعرفة المصغّرة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+<style>
+:root{
+  --ink:#161b22;
+  --night:#1b2333;
+  --night-2:#232d42;
+  --parchment:#f6f1e4;
+  --parchment-2:#eee6d3;
+  --gold:#c9973f;
+  --gold-bright:#e0b25c;
+  --teal:#2f6f68;
+  --teal-bright:#3f8f86;
+  --rose:#b5543f;
+  --ok:#3f8f5e;
+  --warn:#c9973f;
+  --danger:#b5543f;
+  --line: rgba(198,168,110,0.25);
+  --shadow: 0 12px 30px rgba(10,14,22,0.35);
+  --radius: 14px;
+  --font-display:'Cairo', sans-serif;
+  --font-body:'Tajawal', sans-serif;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;scroll-behavior: smooth;}
+body{
+  background:
+    radial-gradient(1100px 700px at 85% -10%, rgba(63,143,134,0.18), transparent 60%),
+    radial-gradient(900px 600px at 5% 110%, rgba(201,151,63,0.12), transparent 55%),
+    var(--night);
+  color:var(--parchment);
+  font-family:var(--font-body);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+
+::selection{ background:var(--gold); color:var(--ink); }
+
+.brandmark{ display:flex;align-items:center;gap:10px; }
+.brandmark .glyph{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(145deg, var(--gold-bright), var(--teal-bright));
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-display); font-weight:800; color:var(--ink); font-size:18px;
+  box-shadow: 0 6px 16px rgba(201,151,63,0.35);
+}
+.brandmark h1{ font-family:var(--font-display); font-weight:800; font-size:20px; margin:0; letter-spacing:0.3px; }
+.brandmark span.tag{ display:block; font-size:11px; font-weight:400; color:var(--gold-bright); margin-top:2px; letter-spacing:1px; }
+
+header.topbar{
+  position:sticky; top:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:14px 20px;
+  background:rgba(27,35,51,0.78);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-right{ display:flex; align-items:center; gap:6px; }
+.topbar nav{ display:flex; gap:6px; flex-wrap:wrap; }
+.navbtn{
+  border:1px solid transparent; background:transparent; color:var(--parchment);
+  font-family:var(--font-body); font-weight:500; font-size:14px;
+  padding:9px 16px; border-radius:999px; cursor:pointer; transition:.2s; white-space:nowrap;
+}
+.navbtn:hover{ background:rgba(224,178,92,0.1); }
+.navbtn.active{ background:var(--gold-bright); color:var(--ink); font-weight:700; }
+
+.icon-btn{
+  width:40px; height:40px; border-radius:50%; border:1px solid var(--line);
+  background:rgba(255,255,255,0.03); color:var(--parchment); font-size:17px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; transition:.2s; flex:none;
+}
+.icon-btn:hover{ border-color:var(--gold-bright); background:rgba(224,178,92,0.1); }
+
+main{ max-width:1080px; margin:0 auto; padding:28px 18px 80px; }
+
+.view{ display:none; animation:fadein .35s ease; }
+.view.active{ display:block; }
+@keyframes fadein{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+.hero{ text-align:center; padding:34px 10px 8px; }
+.hero h2{
+  font-family:var(--font-display); font-weight:800; font-size:clamp(26px,5vw,38px);
+  margin:0 0 10px;
+  background:linear-gradient(90deg, var(--parchment), var(--gold-bright));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p{ color:#c9d3d8; font-size:15px; max-width:560px; margin:0 auto; line-height:1.9; }
+
+.dropzone{
+  margin:26px auto 0; max-width:640px; border:1.5px dashed var(--line);
+  border-radius:var(--radius); padding:38px 20px; text-align:center;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);
+  cursor:pointer; transition:.2s;
+}
+.dropzone:hover, .dropzone.dragover{ border-color:var(--gold-bright); background:rgba(224,178,92,0.06); }
+.dropzone .icon{ font-size:34px; margin-bottom:10px; }
+.dropzone h3{ font-family:var(--font-display); margin:0 0 6px; font-size:17px; }
+.dropzone p{ margin:0; color:#9fb0b6; font-size:13px; }
+.dropzone input[type=file]{ display:none; }
+
+.orline{ display:flex; align-items:center; gap:12px; max-width:640px; margin:22px auto; color:#7f8ea3; font-size:12px; }
+.orline::before, .orline::after{ content:''; flex:1; height:1px; background:var(--line); }
+
+textarea.pastebox{
+  width:100%; max-width:640px; display:block; margin:0 auto;
+  min-height:140px; resize:vertical;
+  background:var(--night-2); color:var(--parchment);
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px; font-family:'Courier New', monospace; font-size:13px; direction:ltr; text-align:left;
+}
+textarea.pastebox:focus{ outline:none; border-color:var(--gold-bright); }
+
+.center-actions{ text-align:center; margin-top:18px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+
+.btn{
+  font-family:var(--font-body); font-weight:700; font-size:14px;
+  border:none; border-radius:999px; padding:11px 26px; cursor:pointer; transition:.2s;
+}
+.btn-gold{ background:linear-gradient(120deg, var(--gold-bright), var(--gold)); color:var(--ink); box-shadow:0 8px 20px rgba(201,151,63,0.28); }
+.btn-gold:hover{ transform:translateY(-1px); box-shadow:0 12px 24px rgba(201,151,63,0.38); }
+.btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--parchment); }
+.btn-ghost:hover{ border-color:var(--gold-bright); background:rgba(224,178,92,0.1); }
+.btn-teal{ background:linear-gradient(120deg, var(--teal-bright), var(--teal)); color:#eafff9; }
+.btn-danger{ background:transparent; border:1px solid var(--rose); color:var(--rose); }
+.btn-danger:hover{ background:var(--rose); color:#fff; }
+.btn-sm{ padding:8px 16px; font-size:12.5px; }
+.btn:disabled{ opacity:.4; cursor:not-allowed; }
+
+.status-msg{ text-align:center; margin-top:14px; font-size:13px; min-height:18px; }
+.status-msg.ok{ color:var(--ok); }
+.status-msg.err{ color:var(--danger); }
+.sample-toggle{ text-align:center; margin-top:8px; }
+.sample-toggle a{ color:var(--gold-bright); font-size:12.5px; cursor:pointer; text-decoration:underline; }
+
+.filters{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:center;
+  margin-bottom:22px; padding:14px; background:rgba(255,255,255,0.02);
+  border:1px solid var(--line); border-radius:var(--radius);
+}
+select, .search-input{
+  background:var(--night-2); color:var(--parchment); border:1px solid var(--line);
+  border-radius:10px; padding:9px 12px; font-family:var(--font-body); font-size:13px; cursor:pointer;
+}
+select:focus, .search-input:focus{ outline:none; border-color:var(--gold-bright); }
+.search-input{ min-width:160px; cursor:text; }
+
+.progress-bar-wrap{ max-width:980px; margin:0 auto 22px; padding:0 2px; }
+.progress-track{ height:8px; border-radius:999px; background:var(--night-2); overflow:hidden; border:1px solid var(--line); }
+.progress-fill{ height:100%; background:linear-gradient(90deg, var(--teal-bright), var(--gold-bright)); transition:width .4s ease; }
+.progress-stats{ display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; font-size:12px; color:#9fb0b6; margin-top:8px; }
+.progress-stats b{ color:var(--parchment); }
+
+.card-stage{ display:flex; justify-content:center; min-height:380px; align-items:flex-start; width:100%; }
+.feed-wrap { display: flex; flex-direction: column; gap: 40px; align-items: center; width: 100%; max-width: 600px; margin: 0 auto; padding-bottom: 40px; }
+.lcard-wrapper { width: 100%; transition: 0.4s ease; display:flex; flex-direction:column; align-items:center; }
+.lcard-wrapper.done { opacity: 0.4; filter: grayscale(50%); pointer-events: none; transform: scale(0.98); }
+.learn-tile { cursor: pointer; }
+
+.lcard{
+  width:100%; max-width:560px; background:linear-gradient(165deg, var(--parchment), var(--parchment-2));
+  color:var(--ink); border-radius:20px; padding:30px 28px 24px; box-shadow: var(--shadow);
+  position:relative; border:1px solid rgba(0,0,0,0.06); margin-bottom: 22px;
+}
+.lcard::before{
+  content:''; position:absolute; inset:0; border-radius:20px;
+  background:linear-gradient(165deg, rgba(63,143,134,0.06), transparent 40%); pointer-events:none;
+}
+.badges{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; padding-right: 42px; } /* padding to avoid TTS button overlap */
+.badge{ font-size:11.5px; font-weight:700; padding:5px 12px; border-radius:999px; font-family:var(--font-body); }
+.badge.cat{ background:var(--teal); color:#eafff9; }
+.badge.book{ background:rgba(0,0,0,0.08); color:#4a4030; border:1px solid rgba(0,0,0,0.12); }
+.badge.status{ font-weight:700; }
+.badge.status.new{ background:rgba(181,84,63,0.18); color:#9c4530; } 
+.badge.status.trying{ background:rgba(201,151,63,0.18); color:#8a6420; } 
+.badge.status.following{ background:rgba(63,143,94,0.18); color:#256f43; } 
+
+.lcard .topic{ font-size:12.5px; color:#7c7358; margin-bottom:6px; font-weight:500; }
+.lcard h3.headline{ font-family:var(--font-display); font-weight:800; font-size:22px; line-height:1.5; margin:0 0 16px; color:var(--ink); }
+.lcard .takeaway{ font-size:15.5px; line-height:1.95; margin:0 0 16px; color:#2c2a22; }
+.insight-box{ background:rgba(63,143,134,0.08); border-right:3px solid var(--teal); padding:12px 14px; border-radius:8px; margin-top:14px; }
+.insight-box .lbl{ font-size:11.5px; font-weight:700; color:var(--teal); display:block; margin-bottom:4px; }
+.insight-box p{ margin:0; font-size:14px; line-height:1.8; color:#33362e; }
+
+.meta-row{ display:flex; justify-content:space-between; margin-top:18px; font-size:11px; color:#8a8368; }
+
+.tts-btn {
+  position: absolute;
+  top: 24px; left: 24px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(198,168,110,0.6);
+  border-radius: 50%; width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: 0.2s; font-size: 17px;
+  z-index: 10; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+.tts-btn:hover { background: var(--gold-bright); color: var(--ink); transform: scale(1.05); }
+
+.card-actions{ display:flex; gap:10px; max-width:560px; width:100%; }
+.act-btn{
+  flex:1; border:none; border-radius:12px; padding:13px 8px; cursor:pointer;
+  font-family:var(--font-body); font-weight:700; font-size:13px; transition:.2s;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; text-align:center;
+}
+.act-btn .ic{ font-size:18px; }
+.act-btn.following{ background:rgba(63,143,94,0.14); color:var(--ok); border:1px solid rgba(63,143,94,0.3); }
+.act-btn.following:hover{ background:var(--ok); color:#fff; }
+.act-btn.trying{ background:rgba(201,151,63,0.14); color:var(--warn); border:1px solid rgba(201,151,63,0.3); }
+.act-btn.trying:hover{ background:var(--warn); color:#1b1400; }
+.act-btn.new{ background:rgba(181,84,63,0.14); color:var(--danger); border:1px solid rgba(181,84,63,0.3); }
+.act-btn.new:hover{ background:var(--danger); color:#fff; }
+
+.empty-state{ text-align:center; padding:60px 20px; color:#9fb0b6; width:100%; }
+.empty-state .ic{ font-size:44px; margin-bottom:14px; }
+.empty-state h3{ font-family:var(--font-display); color:var(--parchment); }
+
+.deck-index{ text-align:center; font-size:13px; color:#7f8ea3; margin-bottom:10px; }
+
+.db-toolbar{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;
+  margin-bottom:16px; padding:14px; background:rgba(255,255,255,0.02);
+  border:1px solid var(--line); border-radius:var(--radius);
+}
+.db-toolbar .grp{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.db-count{ font-size:12.5px; color:#9fb0b6; margin-bottom:8px;}
+.db-count b{ color:var(--gold-bright); }
+
+.selectbar{
+  display:none; align-items:center; gap:10px; flex-wrap:wrap;
+  background:rgba(224,178,92,0.08); border:1px solid var(--gold-bright);
+  border-radius:var(--radius); padding:10px 14px; margin-bottom:16px; font-size:13px;
+}
+.selectbar.show{ display:flex; }
+.selectbar .cnt{ font-weight:700; color:var(--gold-bright); }
+.selectbar .spacer{ flex:1; }
+
+.grid-wrap{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:14px; width: 100%; }
+.group-heading{
+  font-family:var(--font-display); font-weight:800; font-size:16px; color:var(--gold-bright);
+  margin:26px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);
+  display:flex; align-items:center; justify-content:space-between; gap:8px; width: 100%;
+}
+.group-heading .n{ font-family:var(--font-body); font-weight:500; font-size:12px; color:#9fb0b6; }
+
+.tile{
+  position:relative; background:linear-gradient(165deg, var(--parchment), var(--parchment-2));
+  color:var(--ink); border-radius:14px; padding:16px 16px 14px; cursor:pointer;
+  border:2px solid transparent; transition:.15s; display:flex; flex-direction:column; gap:8px;
+}
+.tile:hover{ transform:translateY(-2px); box-shadow:var(--shadow); }
+.tile.selected{ border-color:var(--gold-bright); box-shadow:0 0 0 3px rgba(224,178,92,0.25); }
+.tile .tile-check{
+  position:absolute; top:10px; left:10px; width:20px; height:20px; border-radius:6px;
+  border:2px solid rgba(0,0,0,0.25); background:rgba(255,255,255,0.6);
+  display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800;
+}
+.tile.selected .tile-check{ background:var(--gold-bright); border-color:var(--gold-bright); color:var(--ink); }
+.tile .tile-badges{ display:flex; gap:6px; flex-wrap:wrap; padding-left:26px; }
+.tile .tile-badge{ font-size:10px; font-weight:700; padding:3px 9px; border-radius:999px; background:var(--teal); color:#eafff9; }
+.tile .tile-badge.book{ background:rgba(0,0,0,0.08); color:#4a4030; }
+.tile .tile-badge.status.following{ background:rgba(63,143,94,0.25); color:#1f5c34; }
+.tile .tile-badge.status.trying{ background:rgba(201,151,63,0.25); color:#6f4d12; }
+.tile .tile-badge.status.new{ background:rgba(181,84,63,0.25); color:#7c3421; }
+.tile h4{ font-family:var(--font-display); font-size:14.5px; font-weight:800; margin:0; line-height:1.5; color:var(--ink); }
+.tile p.snip{ font-size:12.5px; line-height:1.7; color:#3f3b2e; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.tile .tile-actions{ display:flex; gap:6px; margin-top:6px; }
+.tile .tile-actions button{
+  flex:1; border:none; border-radius:8px; padding:7px 4px; font-size:11.5px; font-weight:700; cursor:pointer;
+  background:rgba(0,0,0,0.06); color:#3a3626; transition:.2s;
+}
+.tile .tile-actions button:hover{ background:rgba(0,0,0,0.12); }
+.tile .tile-actions button.del{ color:var(--rose); }
+
+.list-single{ max-width:640px; margin:0 auto; display:flex; flex-direction:column; gap:14px; }
+.load-more-wrap{ text-align:center; margin-top:26px; padding:20px; width: 100%; }
+.single-nav{ display:flex; justify-content:center; gap:10px; margin-top:16px; align-items:center; width: 100%;}
+
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(10,14,22,0.6); backdrop-filter:blur(3px);
+  display:none; align-items:flex-start; justify-content:center; z-index:200; padding:40px 16px; overflow-y:auto;
+}
+.modal-backdrop.show{ display:flex; }
+.modal{
+  background:var(--night-2); border:1px solid var(--line); border-radius:16px;
+  width:100%; max-width:620px; padding:24px; box-shadow:var(--shadow); animation:fadein .25s ease;
+}
+.modal h3{ font-family:var(--font-display); margin:0 0 6px; font-size:19px; }
+.modal .sub{ color:#9fb0b6; font-size:12.5px; margin-bottom:18px; }
+.modal-close{ float:left; background:none; border:none; color:var(--parchment); font-size:20px; cursor:pointer; opacity:.7; }
+.modal-close:hover{ opacity:1; }
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:12.5px; font-weight:700; color:var(--gold-bright); margin-bottom:6px; }
+.field input, .field select, .field textarea{
+  width:100%; background:var(--night); color:var(--parchment); border:1px solid var(--line);
+  border-radius:10px; padding:10px 12px; font-family:var(--font-body); font-size:13.5px;
+}
+.field textarea{ min-height:70px; resize:vertical; }
+.field input:focus, .field select:focus, .field textarea:focus{ outline:none; border-color:var(--gold-bright); }
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap; }
+
+#learnModalBackdrop .modal-close { 
+  position:absolute; top:-40px; left:0; width:34px; height:34px; border-radius:17px; 
+  background:var(--night-2); color:var(--parchment); border:1px solid var(--line); 
+  z-index:10; display:flex; align-items:center; justify-content:center; opacity:1; font-size: 16px; 
+}
+#learnModalBackdrop .modal-close:hover { border-color: var(--gold-bright); }
+
+.settings-section{ margin-bottom:22px; }
+.settings-section h4{ font-family:var(--font-display); font-size:14.5px; margin:0 0 4px; color:var(--parchment); }
+.settings-section p.desc{ font-size:12px; color:#9fb0b6; margin:0 0 12px; }
+.settings-row{ display:flex; gap:10px; flex-wrap:wrap; }
+.settings-divider{ height:1px; background:var(--line); margin:20px 0; }
+.danger-zone{ border:1px solid rgba(181,84,63,0.35); border-radius:12px; padding:16px; background:rgba(181,84,63,0.05); }
+.danger-zone h4{ color:var(--rose); }
+
+.scope-picker{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.scope-picker select{ flex:1; min-width:140px; }
+
+@media (max-width:600px){
+  header.topbar{ padding:10px 12px; flex-wrap:wrap; gap:8px; }
+  .topbar nav{ width:100%; justify-content:space-between; }
+  .navbtn{ flex:1; padding:9px 6px; font-size:12.5px; text-align:center;}
+  main{ padding:18px 12px 70px; }
+  .lcard{ padding:22px 18px 18px; margin-bottom:18px; }
+  .lcard h3.headline{ font-size:19px; }
+  .card-actions{ flex-wrap:wrap; }
+  .tts-btn { top: 16px; left: 16px; width: 34px; height: 34px; font-size: 15px; }
+}
+
+.toast{
+  position:fixed; bottom:22px; left:50%; transform:translateX(-50%) translateY(20px);
+  background:var(--night-2); color:var(--parchment); border:1px solid var(--gold-bright);
+  padding:11px 22px; border-radius:999px; font-size:13px; z-index:300;
+  opacity:0; pointer-events:none; transition:.3s;
+  box-shadow:var(--shadow); max-width:90vw; text-align:center;
+}
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+#printArea{ display:none; }
+@media print{
+  body *{ visibility:hidden; }
+  #printArea, #printArea *{ visibility:visible; }
+  #printArea{ display:block; position:absolute; top:0; right:0; left:0; }
+  .print-card{ page-break-after:always; padding:28px; direction:rtl; color:#000; }
+  .print-card:last-child{ page-break-after:auto; }
+  .print-card .p-badges{ font-size:11px; color:#666; margin-bottom:10px; }
+  .print-card h2{ font-family:'Cairo', sans-serif; font-size:22px; margin:0 0 14px; }
+  .print-card .p-topic{ font-size:12px; color:#777; margin-bottom:6px; }
+  .print-card .p-take{ font-size:14px; line-height:1.9; margin-bottom:14px; }
+  .print-card .p-insight{ font-size:13px; line-height:1.8; border-right:3px solid #2f6f68; padding:10px 14px; background:#f4f4f0; }
+  .print-card .p-insight b{ display:block; margin-bottom:4px; color:#2f6f68; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brandmark">
+    <div class="glyph">ا</div>
+    <div>
+      <h1>ارتقاء</h1>
+      <span class="tag">MICRO-LEARNING</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <nav>
+      <button class="navbtn active" data-view="import">📥 استيراد</button>
+      <button class="navbtn" data-view="learn">📖 التعلم</button>
+      <button class="navbtn" data-view="database">🗂 قاعدة البيانات</button>
+    </nav>
+    <button class="icon-btn" id="settingsBtn" title="الإعدادات">⚙️</button>
+  </div>
+</header>
+
+<main>
+  <section class="view active" id="view-import">
+    <div class="hero">
+      <h2>حوّل كتبك إلى بطاقات معرفة</h2>
+      <p>ارفع ملف JSON يحتوي على بطاقات التعلّم المصغّرة، وسيتم تنظيمها تلقائيًا دون تكرار في قاعدة بيانات محلية بمتصفحك.</p>
+    </div>
+
+    <div class="dropzone" id="dropzone">
+      <div class="icon">📄</div>
+      <h3>اسحب وأفلت ملف JSON هنا</h3>
+      <p>أو اضغط للاختيار من جهازك (.json)</p>
+      <input type="file" id="fileInput" accept="application/json,.json">
+    </div>
+
+    <div class="orline">أو الصق النص مباشرة</div>
+
+    <textarea class="pastebox" id="pasteArea" placeholder='[{"book_title": "...", "main_category": "...", "topic": "...", "headline": "...", "takeaway": "...", "actionable_insight": "..."}]'></textarea>
+
+    <div class="center-actions">
+      <button class="btn btn-gold" id="importBtn">استيراد البطاقات</button>
+      <button class="btn btn-ghost" id="addCardBtn">➕ إضافة بطاقة يدويًا</button>
+    </div>
+
+    <div class="status-msg" id="importStatus"></div>
+    <div class="sample-toggle"><a id="sampleLink">تحميل بيانات تجريبية للمعاينة</a></div>
+  </section>
+
+  <section class="view" id="view-learn">
+
+    <div class="filters">
+      <select id="learnViewSelect">
+        <option value="single" selected>🃏 بطاقة تلو الأخرى (الافتراضي)</option>
+        <option value="feed">📜 تمرير عمودي (Feed)</option>
+        <option value="grid">🔲 شبكة تفاعلية</option>
+      </select>
+      <select id="filterCategory"></select>
+      <select id="filterBook"></select>
+      <select id="filterStatus">
+        <option value="all">كل البطاقات</option>
+        <option value="needs_action" selected>في طور التعلم (لا أطبقها/أحاول)</option>
+        <option value="new">لا أطبقها بعد</option>
+        <option value="trying">أحاول تطبيقها</option>
+        <option value="following">أطبقها بانتظام</option>
+      </select>
+      <input type="text" class="search-input" id="searchInput" placeholder="🔍 بحث في البطاقات...">
+      <button class="btn btn-ghost" id="shuffleBtn">🔀 عشوائي ذكي</button>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-stats">
+        <span>الإجمالي: <b id="statTotal">0</b></span>
+        <span>أطبقها: <b id="statFollowing">0</b></span>
+        <span>أحاول: <b id="statTrying">0</b></span>
+        <span>لا أطبقها: <b id="statNew">0</b></span>
+      </div>
+    </div>
+
+    <div class="deck-index" id="deckIndex"></div>
+
+    <div class="card-stage" id="cardStage"></div>
+
+  </section>
+
+  <section class="view" id="view-database">
+
+    <div class="filters">
+      <select id="dbFilterCategory"></select>
+      <select id="dbFilterBook"></select>
+      <select id="dbFilterStatus">
+        <option value="all">كل الحالات</option>
+        <option value="new">لا أطبقه بعد</option>
+        <option value="trying">أحاول تطبيقه</option>
+        <option value="following">أطبق هذا المبدأ</option>
+      </select>
+      <input type="text" class="search-input" id="dbSearchInput" placeholder="🔍 بحث في البطاقات...">
+    </div>
+
+    <div class="db-toolbar">
+      <div class="grp">
+        <label style="font-size:12.5px;color:#9fb0b6;">طريقة العرض:</label>
+        <select id="viewModeSelect">
+          <option value="single">بطاقة تلو الأخرى</option>
+          <option value="20" selected>20 بطاقة بالصفحة</option>
+          <option value="40">40 بطاقة بالصفحة</option>
+          <option value="60">60 بطاقة بالصفحة</option>
+        </select>
+        <label style="font-size:12.5px;color:#9fb0b6;">تجميع حسب:</label>
+        <select id="groupBySelect">
+          <option value="none">بدون تجميع</option>
+          <option value="main_category">التصنيف</option>
+          <option value="book_title">الكتاب</option>
+        </select>
+      </div>
+      <div class="grp">
+        <button class="btn btn-ghost btn-sm" id="selectModeBtn">☑ تحديد متعدد</button>
+        <button class="btn btn-ghost btn-sm" id="dbExportJsonBtn" title="تصدير بيانات جميع البطاقات كملف JSON لفتحها في جهاز آخر">⬇ تصدير كملف JSON</button>
+        <button class="btn btn-gold btn-sm" id="dbAddCardBtn">➕ إضافة بطاقة</button>
+      </div>
+    </div>
+
+    <div class="selectbar" id="selectBar">
+      <span class="cnt"><span id="selCount">0</span> بطاقة محددة</span>
+      <button class="btn btn-ghost btn-sm" id="selAllBtn">تحديد الكل في هذه الصفحة</button>
+      <button class="btn btn-ghost btn-sm" id="selNoneBtn">إلغاء التحديد</button>
+      <div class="spacer"></div>
+      <button class="btn btn-teal btn-sm" id="selExportPdfBtn">⬇ تصدير المحدد PDF</button>
+      <button class="btn btn-danger btn-sm" id="selDeleteBtn">🗑 حذف المحدد</button>
+    </div>
+
+    <div class="db-count"><b id="dbResultCount">0</b> بطاقة مطابقة</div>
+    <div id="dbContent" style="margin-top:14px; width:100%;"></div>
+
+    <div class="load-more-wrap" id="loadMoreWrap" style="display:none;">
+      <button class="btn btn-ghost" id="loadMoreBtn">جارٍ تحميل المزيد ⬇</button>
+    </div>
+    <div class="single-nav" id="singleNavWrap" style="display:none;">
+      <button class="btn btn-ghost" id="singlePrevBtn">◀ السابق</button>
+      <span class="deck-index" id="singlePosLabel" style="margin:0;align-self:center;"></span>
+      <button class="btn btn-ghost" id="singleNextBtn">التالي ▶</button>
+    </div>
+
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-backdrop" id="learnModalBackdrop">
+  <div class="modal" style="background:transparent; border:none; box-shadow:none; padding:0; max-width:560px; position:relative;">
+    <button class="modal-close" onclick="closeModal('learnModalBackdrop')">✕</button>
+    <div id="learnModalBody"></div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="cardModalBackdrop">
+  <div class="modal">
+    <button class="modal-close" id="cardModalClose">✕</button>
+    <h3 id="cardModalTitle">إضافة بطاقة</h3>
+    <div class="sub">املأ الحقول التالية ثم احفظ</div>
+    <div class="field">
+      <label>الكتاب</label>
+      <input type="text" id="fBook" placeholder="اسم الكتاب">
+    </div>
+    <div class="field">
+      <label>التصنيف</label>
+      <input type="text" id="fCategory" list="categoryList" placeholder="التصنيف الرئيسي">
+      <datalist id="categoryList"></datalist>
+    </div>
+    <div class="field">
+      <label>الموضوع الفرعي</label>
+      <input type="text" id="fTopic" placeholder="الموضوع">
+    </div>
+    <div class="field">
+      <label>العنوان</label>
+      <input type="text" id="fHeadline" placeholder="عنوان البطاقة">
+    </div>
+    <div class="field">
+      <label>الفكرة الأساسية</label>
+      <textarea id="fTakeaway" placeholder="الفكرة أو الخلاصة"></textarea>
+    </div>
+    <div class="field">
+      <label>نصيحة قابلة للتطبيق</label>
+      <textarea id="fInsight" placeholder="خطوة عملية"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="cardModalCancel">إلغاء</button>
+      <button class="btn btn-gold" id="cardModalSave">حفظ البطاقة</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="settingsModalBackdrop">
+  <div class="modal" style="max-width:560px;">
+    <button class="modal-close" id="settingsModalClose">✕</button>
+    <h3>⚙️ الإعدادات</h3>
+    <div class="sub">التصدير، الاستيراد، وإدارة قاعدة البيانات</div>
+
+    <div class="settings-section">
+      <h4>📤 تصدير البيانات</h4>
+      <p class="desc">نزّل نسخة كاملة من بطاقاتك لتفتحها على جهاز آخر، أو قاعدة البيانات للنسخ الاحتياطي</p>
+      <div class="settings-row">
+        <button class="btn btn-ghost btn-sm" id="exportJsonBtn">⬇ تنزيل البطاقات كملف JSON</button>
+        <button class="btn btn-teal btn-sm" id="exportDbBtn">⬇ تنزيل قاعدة البيانات كاملة (SQLite)</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <h4>🖨 تصدير كـ PDF</h4>
+      <p class="desc">اختر نطاق البطاقات التي تريد تصديرها كملف PDF (تُفتح نافذة الطباعة لحفظها كـ PDF)</p>
+      <div class="scope-picker">
+        <select id="pdfScopeSelect">
+          <option value="all">كل البطاقات</option>
+          <option value="category">حسب التصنيف</option>
+          <option value="book">حسب الكتاب</option>
+        </select>
+        <select id="pdfScopeValue" style="display:none;"></select>
+      </div>
+      <button class="btn btn-teal btn-sm" id="pdfExportScopeBtn">⬇ تصدير PDF</button>
+    </div>
+
+    <div class="settings-section">
+      <h4>↩ استعادة نسخة SQLite محفوظة</h4>
+      <p class="desc">استرجاع قاعدة بيانات SQLite كاملة محفوظة مسبقًا من جهازك</p>
+      <div class="settings-row">
+        <button class="btn btn-ghost btn-sm" id="loadDbBtn">اختيار ملف .sqlite</button>
+        <input type="file" id="dbFileInput" accept=".sqlite,.db" style="display:none">
+      </div>
+    </div>
+
+    <div class="settings-divider"></div>
+
+    <div class="danger-zone">
+      <h4>⚠ منطقة الخطر</h4>
+      <p class="desc">هذا الإجراء لا يمكن التراجع عنه — تأكد من تنزيل نسخة احتياطية أولًا</p>
+      <button class="btn btn-danger btn-sm" id="resetBtn">🗑 مسح جميع البيانات</button>
+    </div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+const STATUS_LABELS = { 
+  new: "لا أطبقه بعد", 
+  trying: "أحاول تطبيقه", 
+  following: "أطبق هذا المبدأ بانتظام" 
+};
+
+let SQL = null;
+let db = null;
+let currentDeck = [];   
+let deckPos = 0;
+let learnViewMode = 'single'; 
+
+let dbDeck = [];         
+let dbPageSize = 20;     
+let dbLoadedCount = 0;   
+let dbViewMode = '20';   
+let dbGroupBy = 'none';  
+let dbSinglePos = 0;
+let selectMode = false;
+let selectedIds = new Set();
+let editingCardId = null; 
+
+const el = (id) => document.getElementById(id);
+const qs = (sel, root=document) => root.querySelector(sel);
+const qsa = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+/* ---------------------- TTS Logic ---------------------- */
+window.stopSpeech = function() {
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.tts-btn').forEach(b => {
+            b.innerHTML = '🔊';
+            b.dataset.playing = 'false';
+        });
+    }
+};
+
+window.toggleReadCard = function(btn, cardId) {
+    if (!('speechSynthesis' in window)) {
+        toast('عذراً، متصفحك لا يدعم القراءة الصوتية.');
+        return;
+    }
+    
+    // If the button clicked is already playing, stop the speech
+    if (btn.dataset.playing === 'true') {
+        stopSpeech();
+        return;
+    }
+
+    stopSpeech(); // Ensure previous speech is halted
+    
+    const card = getCardById(cardId);
+    if (!card) return;
+    
+    const textToRead = `${card.headline}... الفكرة الأساسية: ${card.takeaway}... نصيحة قابلة للتطبيق: ${card.actionable_insight}`;
+    const utterance = new SpeechSynthesisUtterance(textToRead);
+    
+    // Hint to use Arabic language (Windows will use its native Arabic voices like Microsoft Naayf or Hoda if available)
+    utterance.lang = 'ar-SA';
+    
+    utterance.onend = () => {
+        btn.innerHTML = '🔊';
+        btn.dataset.playing = 'false';
+    };
+    utterance.onerror = () => {
+        btn.innerHTML = '🔊';
+        btn.dataset.playing = 'false';
+    };
+    
+    btn.innerHTML = '⏹';
+    btn.dataset.playing = 'true';
+    window.speechSynthesis.speak(utterance);
+};
+
+
+let toastTimer;
+function toast(msg){
+  const t = el('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
+}
+
+qsa('.navbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=> switchView(btn.dataset.view));
+});
+function switchView(name){
+  stopSpeech(); // Stop playing when switching views
+  qsa('.navbtn').forEach(b=> b.classList.toggle('active', b.dataset.view===name));
+  qsa('.view').forEach(v=> v.classList.remove('active'));
+  el('view-'+name).classList.add('active');
+  if(name === 'learn'){ refreshFilters(); applyFilters(); }
+  if(name === 'database'){ refreshDbFilters(); exitSelectMode(); applyDbFilters(); }
+}
+
+function openModal(id){ el(id).classList.add('show'); }
+function closeModal(id){ el(id).classList.remove('show'); stopSpeech(); }
+el('settingsBtn').addEventListener('click', ()=>{ refreshPdfScopeOptions(); openModal('settingsModalBackdrop'); });
+el('settingsModalClose').addEventListener('click', ()=> closeModal('settingsModalBackdrop'));
+el('settingsModalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='settingsModalBackdrop') closeModal('settingsModalBackdrop'); });
+el('cardModalClose').addEventListener('click', ()=> closeModal('cardModalBackdrop'));
+el('cardModalCancel').addEventListener('click', ()=> closeModal('cardModalBackdrop'));
+el('cardModalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='cardModalBackdrop') closeModal('cardModalBackdrop'); });
+el('learnModalBackdrop').addEventListener('click', (e)=>{ if(e.target.id==='learnModalBackdrop') closeModal('learnModalBackdrop'); });
+
+async function initDb(){
+  if(!SQL){
+    SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` });
+  }
+  db = new SQL.Database();
+  db.run(`
+    CREATE TABLE cards (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      book_title TEXT,
+      main_category TEXT,
+      topic TEXT,
+      headline TEXT,
+      takeaway TEXT,
+      actionable_insight TEXT,
+      UNIQUE(book_title, headline)
+    );
+    CREATE TABLE progress (
+      card_id INTEGER PRIMARY KEY,
+      status TEXT DEFAULT 'new',
+      last_reviewed DATETIME,
+      times_seen INTEGER DEFAULT 0,
+      FOREIGN KEY(card_id) REFERENCES cards(id)
+    );
+  `);
+}
+
+function dbExec(sql, params=[]){
+  const stmt = db.prepare(sql);
+  stmt.bind(params);
+  const rows = [];
+  while(stmt.step()){ rows.push(stmt.getAsObject()); }
+  stmt.free();
+  return rows;
+}
+function dbRun(sql, params=[]){
+  db.run(sql, params);
+}
+
+function persist(){
+  try{
+    const data = db.export();
+    let binary = '';
+    const bytes = new Uint8Array(data);
+    const chunk = 0x8000;
+    for(let i=0;i<bytes.length;i+=chunk){
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+    }
+    localStorage.setItem('irtiqa_db', btoa(binary));
+  }catch(e){ console.warn('autosave failed', e); }
+}
+
+async function tryRestoreFromLocalStorage(){
+  let saved = localStorage.getItem('irtiqa_db');
+  if(!saved) {
+    const oldSaved = localStorage.getItem('mirqat_db');
+    if (oldSaved) {
+       saved = oldSaved;
+       localStorage.setItem('irtiqa_db', oldSaved);
+       localStorage.removeItem('mirqat_db');
+    }
+  }
+
+  if(!saved) return false;
+  try{
+    if(!SQL){ SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/${f}` }); }
+    const binary = atob(saved);
+    const bytes = new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i] = binary.charCodeAt(i);
+    db = new SQL.Database(bytes);
+    
+    dbRun("UPDATE progress SET status='following' WHERE status='mastered'");
+    dbRun("UPDATE progress SET status='trying' WHERE status='review_later'");
+    
+    return true;
+  }catch(e){ console.warn('restore failed', e); return false; }
+}
+
+window.addEventListener('load', async ()=>{
+  const restored = await tryRestoreFromLocalStorage();
+  if(!restored) await initDb();
+});
+
+function validateAndNormalize(json){
+  if(!Array.isArray(json)) throw new Error('يجب أن يكون الملف مصفوفة من البطاقات (Array).');
+  const required = ['book_title','main_category','topic','headline','takeaway','actionable_insight'];
+  return json.map((c, idx)=>{
+    for(const key of required){
+      if(typeof c[key] !== 'string' || !c[key].trim()){
+        throw new Error(`البطاقة رقم ${idx+1} تفتقد إلى حقل "${key}" أو أنه فارغ.`);
+      }
+    }
+    return {
+      book_title: c.book_title.trim(),
+      main_category: c.main_category.trim(),
+      topic: c.topic.trim(),
+      headline: c.headline.trim(),
+      takeaway: c.takeaway.trim(),
+      actionable_insight: c.actionable_insight.trim()
+    };
+  });
+}
+
+async function importCards(cards){
+  if(!db) await initDb();
+  const insertCard = db.prepare(`INSERT OR IGNORE INTO cards (book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?)`);
+  const insertProgress = db.prepare(`INSERT INTO progress (card_id, status, times_seen) VALUES (?, 'new', 0)`);
+  db.run('BEGIN TRANSACTION');
+  let addedCount = 0;
+  let duplicateCount = 0;
+  
+  try{
+    for(const c of cards){
+      const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [c.book_title, c.headline]);
+      if(existing.length > 0) {
+          duplicateCount++;
+          continue; 
+      }
+
+      insertCard.run([c.book_title, c.main_category, c.topic, c.headline, c.takeaway, c.actionable_insight]);
+      const idRow = dbExec('SELECT last_insert_rowid() as id');
+      const newId = idRow[0].id;
+      insertProgress.run([newId]);
+      addedCount++;
+    }
+    db.run('COMMIT');
+  }catch(e){
+    db.run('ROLLBACK');
+    throw e;
+  }finally{
+    insertCard.free();
+    insertProgress.free();
+  }
+  persist();
+  return { added: addedCount, duplicates: duplicateCount };
+}
+
+function setImportStatus(msg, cls){
+  const s = el('importStatus');
+  s.textContent = msg;
+  s.className = 'status-msg ' + (cls||'');
+}
+
+async function handleJsonText(text){
+  setImportStatus('جاري التحقق من البيانات...', '');
+  let parsed;
+  try{
+    parsed = JSON.parse(text);
+  }catch(e){
+    setImportStatus('⚠ تعذّر تحليل JSON. تأكد من صحة تنسيق الملف.', 'err');
+    return;
+  }
+  try{
+    const cards = validateAndNormalize(parsed);
+    const res = await importCards(cards);
+    
+    if (res.added === 0 && res.duplicates > 0) {
+      setImportStatus(`ℹ️ تم تجاهل ${res.duplicates} بطاقة لأنها موجودة مسبقًا في قاعدة البيانات.`, 'ok');
+    } else if (res.duplicates > 0) {
+      setImportStatus(`✅ تم استيراد ${res.added} بطاقة وتجاهل ${res.duplicates} بطاقة مكررة.`, 'ok');
+      toast(`تمت إضافة ${res.added} بطاقة`);
+      setTimeout(()=> switchView('learn'), 1200);
+    } else {
+      setImportStatus(`✅ تم استيراد ${res.added} بطاقة جديدة بنجاح!`, 'ok');
+      toast(`تمت إضافة ${res.added} بطاقة إلى مكتبتك`);
+      setTimeout(()=> switchView('learn'), 800);
+    }
+  }catch(e){
+    setImportStatus('⚠ ' + e.message, 'err');
+  }
+}
+
+el('importBtn').addEventListener('click', async ()=>{
+  const text = el('pasteArea').value.trim();
+  if(!text){ setImportStatus('⚠ الرجاء رفع ملف أو لصق نص JSON أولاً.', 'err'); return; }
+  await handleJsonText(text);
+});
+
+el('addCardBtn').addEventListener('click', ()=>{ openCardModal(); });
+el('dbAddCardBtn').addEventListener('click', ()=>{ openCardModal(); });
+
+function openCardModal(cardId = null){
+  editingCardId = cardId;
+  el('cardModalTitle').textContent = cardId ? 'تعديل البطاقة' : 'إضافة بطاقة';
+  
+  if(cardId){
+    const c = getCardById(cardId);
+    if(c){
+      el('fBook').value = c.book_title;
+      el('fCategory').value = c.main_category;
+      el('fTopic').value = c.topic;
+      el('fHeadline').value = c.headline;
+      el('fTakeaway').value = c.takeaway;
+      el('fInsight').value = c.actionable_insight;
+    }
+  } else {
+    el('fBook').value = '';
+    el('fCategory').value = '';
+    el('fTopic').value = '';
+    el('fHeadline').value = '';
+    el('fTakeaway').value = '';
+    el('fInsight').value = '';
+  }
+  
+  if(db) {
+    const cats = dbExec('SELECT DISTINCT main_category FROM cards');
+    el('categoryList').innerHTML = cats.map(c=>`<option value="${escapeHtml(c.main_category)}">`).join('');
+  }
+  openModal('cardModalBackdrop');
+}
+
+el('cardModalSave').addEventListener('click', ()=>{
+  const data = {
+    book_title: el('fBook').value.trim() || 'بدون كتاب',
+    main_category: el('fCategory').value.trim() || 'عام',
+    topic: el('fTopic').value.trim() || 'عام',
+    headline: el('fHeadline').value.trim(),
+    takeaway: el('fTakeaway').value.trim(),
+    actionable_insight: el('fInsight').value.trim()
+  };
+  
+  if(!data.headline || !data.takeaway){
+    alert('الرجاء إدخال العنوان والفكرة الأساسية على الأقل.');
+    return;
+  }
+
+  if(editingCardId){
+    dbRun(`UPDATE cards SET book_title=?, main_category=?, topic=?, headline=?, takeaway=?, actionable_insight=? WHERE id=?`, 
+      [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight, editingCardId]);
+    toast('✅ تم تحديث البطاقة');
+  } else {
+    const existing = dbExec(`SELECT id FROM cards WHERE book_title=? AND headline=?`, [data.book_title, data.headline]);
+    if(existing.length > 0) {
+      alert('هذه البطاقة موجودة مسبقًا في قاعدة البيانات!');
+      return;
+    }
+
+    dbRun(`INSERT INTO cards (book_title, main_category, topic, headline, takeaway, actionable_insight) VALUES (?,?,?,?,?,?)`,
+      [data.book_title, data.main_category, data.topic, data.headline, data.takeaway, data.actionable_insight]);
+    const newId = dbExec('SELECT last_insert_rowid() as id')[0].id;
+    dbRun(`INSERT INTO progress (card_id, status, times_seen) VALUES (?, 'new', 0)`, [newId]);
+    toast('✅ تمت الإضافة بنجاح');
+  }
+  
+  persist();
+  closeModal('cardModalBackdrop');
+  if(el('view-database').classList.contains('active')) applyDbFilters();
+  if(el('view-learn').classList.contains('active')) applyFilters();
+});
+
+const dz = el('dropzone');
+dz.addEventListener('click', ()=> el('fileInput').click());
+dz.addEventListener('dragover', e=>{ e.preventDefault(); dz.classList.add('dragover'); });
+dz.addEventListener('dragleave', ()=> dz.classList.remove('dragover'));
+dz.addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) readFileAsText(file);
+});
+el('fileInput').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(file) readFileAsText(file);
+});
+function readFileAsText(file){
+  const reader = new FileReader();
+  reader.onload = async ()=>{ el('pasteArea').value = reader.result; await handleJsonText(reader.result); };
+  reader.onerror = ()=> setImportStatus('⚠ تعذّرت قراءة الملف.', 'err');
+  reader.readAsText(file, 'utf-8');
+}
+
+el('sampleLink').addEventListener('click', async ()=>{
+  const sample = [
+    { book_title:"العادات الذرية", main_category:"الإنتاجية", topic:"بناء العادات", headline:"التحسّن 1% يوميًا يغيّر مسارك بالكامل", takeaway:"النتائج الكبيرة لا تأتي من تغييرات جذرية، بل من تراكم تحسينات صغيرة يوميًا مع مرور الوقت.", actionable_insight:"اختر عادة واحدة صغيرة اليوم والتزم بتطبيقها لمدة 5 دقائق فقط، دون انقطاع لمدة أسبوع." },
+    { book_title:"العادات الذرية", main_category:"التفكير والتطوير الذاتي", topic:"الهوية والسلوك", headline:"غيّر هويتك قبل أن تغيّر سلوكك", takeaway:"العادات المستدامة تنبع من تغيير نظرتك لذاتك، وليس فقط من تحديد أهداف خارجية.", actionable_insight:"بدل قول 'أحاول الجري'، قل 'أنا عدّاء' وتصرف بناءً على هذه الهوية الجديدة." },
+    { book_title:"فن اللامبالاة", main_category:"علم النفس", topic:"إدارة القيم", headline:"لا يمكنك أن تهتم بكل شيء دون أن تفقد نفسك", takeaway:"اختيار ما تهتم به بعناية أهم من محاولة الاهتمام بكل شيء من حولك.", actionable_insight:"اكتب اليوم قائمة بثلاث قيم فقط تريد التركيز عليها هذا الشهر، وتجاهل الباقي بوعي." }
+  ];
+  el('pasteArea').value = JSON.stringify(sample, null, 2);
+  await handleJsonText(el('pasteArea').value);
+});
+
+function refreshFilters(){
+  if(!db) return;
+  const catSel = el('filterCategory');
+  const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
+  catSel.innerHTML = '<option value="all">كل التصنيفات</option>' +
+    cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
+
+  const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
+  const bookSel = el('filterBook');
+  bookSel.innerHTML = '<option value="all">كل الكتب</option>' +
+    books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+['filterCategory','filterBook','filterStatus','learnViewSelect'].forEach(id=>{
+  el(id).addEventListener('change', (e)=>{ 
+    if(id === 'learnViewSelect') {
+        learnViewMode = e.target.value;
+        renderLearnStage();
+    } else {
+        applyFilters(); 
+    }
+  });
+});
+
+let searchDebounce;
+el('searchInput').addEventListener('input', ()=>{
+  clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(applyFilters, 220);
+});
+el('shuffleBtn').addEventListener('click', ()=>{
+  applyFilters(true);
+  toast('تم ترتيب البطاقات بذكاء');
+});
+
+function applyFilters(shuffle = false){
+  stopSpeech();
+  if(!db){ currentDeck = []; renderLearnStage(); renderStats(); return; }
+  const cat = el('filterCategory').value;
+  const book = el('filterBook').value;
+  const status = el('filterStatus').value;
+  const search = el('searchInput').value.trim();
+
+  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE 1=1`;
+  const params = [];
+  if(cat !== 'all'){ sql += ' AND c.main_category = ?'; params.push(cat); }
+  if(book !== 'all'){ sql += ' AND c.book_title = ?'; params.push(book); }
+  
+  if(status === 'needs_action') {
+    sql += " AND p.status IN ('new', 'trying')";
+  } else if(status !== 'all') { 
+    sql += ' AND p.status = ?'; params.push(status); 
+  }
+  
+  if(search){
+    sql += ' AND (c.headline LIKE ? OR c.takeaway LIKE ? OR c.topic LIKE ? OR c.actionable_insight LIKE ?)';
+    const like = `%${search}%`;
+    params.push(like, like, like, like);
+  }
+  
+  let orderClause = ` ORDER BY 
+    CASE p.status WHEN 'new' THEN 1 WHEN 'trying' THEN 2 ELSE 3 END ASC, 
+    p.times_seen ASC`;
+    
+  if (shuffle) {
+    orderClause = ` ORDER BY 
+      CASE p.status WHEN 'new' THEN 1 WHEN 'trying' THEN 2 ELSE 3 END ASC, 
+      RANDOM()`;
+  }
+
+  sql += orderClause;
+
+  const rows = dbExec(sql, params);
+  currentDeck = rows.map(r=> r.id);
+  deckPos = 0;
+  renderStats();
+  renderLearnStage();
+}
+
+function renderStats(){
+  if(!db) return;
+  const total = dbExec('SELECT COUNT(*) as n FROM cards')[0].n;
+  const following = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='following'")[0].n;
+  const trying = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='trying'")[0].n;
+  const isNew = dbExec("SELECT COUNT(*) as n FROM progress WHERE status='new'")[0].n;
+  
+  el('statTotal').textContent = total;
+  el('statFollowing').textContent = following;
+  el('statTrying').textContent = trying;
+  el('statNew').textContent = isNew;
+  const pct = total ? Math.round((following/total)*100) : 0;
+  el('progressFill').style.width = pct + '%';
+}
+
+function getCardById(id){
+  const rows = dbExec(`SELECT c.*, p.status, p.times_seen, p.last_reviewed FROM cards c JOIN progress p ON p.card_id=c.id WHERE c.id=?`, [id]);
+  return rows[0];
+}
+
+function generateBigCardHTML(card, mode) {
+  const statusClass = card.status;
+  let actionButtons = '';
+  
+  if (mode === 'single') {
+     actionButtons = `
+       <button class="act-btn following" onclick="handleLearnAction(${card.id}, 'following', true)"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
+       <button class="act-btn trying" onclick="handleLearnAction(${card.id}, 'trying', true)"><span class="ic">🔖</span>أحاول تطبيقه</button>
+       <button class="act-btn new" onclick="handleLearnAction(${card.id}, 'new', false)"><span class="ic">➡️</span>التالي / لا أطبقه بعد</button>
+     `;
+  } else if (mode === 'feed') {
+     actionButtons = `
+       <button class="act-btn following" onclick="handleLearnFeedAction(${card.id}, 'following', this)"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
+       <button class="act-btn trying" onclick="handleLearnFeedAction(${card.id}, 'trying', this)"><span class="ic">🔖</span>أحاول تطبيقه</button>
+       <button class="act-btn new" onclick="handleLearnFeedAction(${card.id}, 'new', this)"><span class="ic">➡️</span>التالي / لا أطبقه بعد</button>
+     `;
+  } else if (mode === 'modal') {
+     actionButtons = `
+       <button class="act-btn following" onclick="handleLearnModalAction(${card.id}, 'following')"><span class="ic">✅</span>أطبق هذا المبدأ بانتظام</button>
+       <button class="act-btn trying" onclick="handleLearnModalAction(${card.id}, 'trying')"><span class="ic">🔖</span>أحاول تطبيقه</button>
+       <button class="act-btn new" onclick="handleLearnModalAction(${card.id}, 'new')"><span class="ic">➡️</span>تحديث: لا أطبقه بعد</button>
+     `;
+  }
+
+  return `
+    <div class="lcard-wrapper" id="lcard-wrap-${card.id}">
+      <div class="lcard">
+        <button class="tts-btn" onclick="toggleReadCard(this, ${card.id})" title="استمع للبطاقة" data-playing="false">🔊</button>
+        <div class="badges">
+          <span class="badge cat">${escapeHtml(card.main_category)}</span>
+          <span class="badge book">📚 ${escapeHtml(card.book_title)}</span>
+          <span class="badge status ${statusClass}">${escapeHtml(STATUS_LABELS[card.status] || card.status)}</span>
+        </div>
+        <div class="topic">${escapeHtml(card.topic)}</div>
+        <h3 class="headline">${escapeHtml(card.headline)}</h3>
+        <p class="takeaway">${escapeHtml(card.takeaway)}</p>
+        <div class="insight-box">
+          <span class="lbl">💡 نصيحة قابلة للتطبيق</span>
+          <p>${escapeHtml(card.actionable_insight)}</p>
+        </div>
+        <div class="meta-row">
+          <span>👁 شوهدت ${card.times_seen || 0} مرة</span>
+          <span>${card.last_reviewed ? 'آخر مراجعة: ' + new Date(card.last_reviewed).toLocaleDateString('ar-EG') : 'لم تُراجع بعد'}</span>
+        </div>
+      </div>
+      <div class="card-actions">${actionButtons}</div>
+    </div>
+  `;
+}
+
+function renderLearnStage(){
+  const stage = el('cardStage');
+  if(!currentDeck.length){
+    stage.innerHTML = `
+      <div class="empty-state">
+        <div class="ic">🗂️</div>
+        <h3>لا توجد بطاقات مطابقة</h3>
+        <p>${db && dbExec('SELECT COUNT(*) as n FROM cards')[0].n ? 'جرّب تعديل الفلاتر أو البحث.' : 'ابدأ باستيراد بطاقاتك من واجهة الاستيراد.'}</p>
+      </div>`;
+    el('deckIndex').textContent = '';
+    return;
+  }
+
+  if (learnViewMode === 'single') {
+     if(deckPos >= currentDeck.length) deckPos = 0; 
+     const card = getCardById(currentDeck[deckPos]);
+     stage.innerHTML = generateBigCardHTML(card, 'single');
+     el('deckIndex').textContent = `البطاقة ${deckPos+1} من ${currentDeck.length} (ضمن الفلتر الحالي)`;
+  } 
+  else if (learnViewMode === 'feed') {
+     el('deckIndex').textContent = `يعرض ${currentDeck.length} بطاقة (تمرير عمودي)`;
+     let html = '<div class="feed-wrap">';
+     const limit = Math.min(currentDeck.length, 100);
+     for(let i=0; i<limit; i++) {
+        html += generateBigCardHTML(getCardById(currentDeck[i]), 'feed');
+     }
+     if (currentDeck.length > 100) html += `<div style="text-align:center;color:#7f8ea3;margin-top:20px;">... و ${currentDeck.length - 100} بطاقة أخرى غير معروضة في التمرير لتسريع الأداء.</div>`;
+     html += '</div>';
+     stage.innerHTML = html;
+  }
+  else if (learnViewMode === 'grid') {
+     el('deckIndex').textContent = `يعرض ${currentDeck.length} بطاقة (شبكة تفاعلية)`;
+     let html = '<div class="grid-wrap">';
+     const limit = Math.min(currentDeck.length, 150);
+     for(let i=0; i<limit; i++) {
+        const c = getCardById(currentDeck[i]);
+        html += `
+          <div class="tile learn-tile" id="learn-tile-${c.id}" onclick="openLearnModal(${c.id})">
+            <div class="tile-badges" style="padding-left:0; padding-bottom:10px;">
+              <span class="tile-badge status ${c.status}">${STATUS_LABELS[c.status]}</span>
+              <span class="tile-badge">${escapeHtml(c.main_category)}</span>
+            </div>
+            <h4>${escapeHtml(c.headline)}</h4>
+            <p class="snip">${escapeHtml(c.takeaway)}</p>
+          </div>
+        `;
+     }
+     html += '</div>';
+     stage.innerHTML = html;
+  }
+}
+
+window.handleLearnAction = function(id, status, isPositiveFeedback) {
+  markCard(id, status, !isPositiveFeedback, true);
+};
+
+window.handleLearnFeedAction = function(id, status, btnEl) {
+  markCard(id, status, true, false); 
+  if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
+  else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+
+  const wrap = btnEl.closest('.lcard-wrapper');
+  if(wrap) {
+    wrap.classList.add('done');
+    const badge = wrap.querySelector('.badge.status');
+    if(badge) {
+       badge.className = `badge status ${status}`;
+       badge.textContent = STATUS_LABELS[status];
+    }
+  }
+};
+
+window.openLearnModal = function(id) {
+  const card = getCardById(id);
+  if(!card) return;
+  el('learnModalBody').innerHTML = generateBigCardHTML(card, 'modal');
+  openModal('learnModalBackdrop');
+};
+
+window.handleLearnModalAction = function(id, status) {
+  markCard(id, status, true, false);
+  closeModal('learnModalBackdrop');
+  if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
+  else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+  
+  const tile = el(`learn-tile-${id}`);
+  if(tile) {
+      const badge = tile.querySelector('.tile-badge.status');
+      if(badge) {
+         badge.className = `tile-badge status ${status}`;
+         badge.textContent = STATUS_LABELS[status];
+      }
+  }
+};
+
+function markCard(id, status, silent = false, autoNext = true){
+  const now = new Date().toISOString();
+  dbRun(`UPDATE progress SET status=?, last_reviewed=?, times_seen=times_seen+1 WHERE card_id=?`, [status, now, id]);
+  persist();
+  
+  if(!silent) {
+    if(status === 'following') toast('✅ رائع! سيظهر هذا المبدأ بشكل أقل');
+    else if(status === 'trying') toast('🔖 ممتاز، استمر بالمحاولة!');
+  }
+  
+  renderStats();
+  if(autoNext) goNext();
+}
+
+function goNext() {
+  stopSpeech(); // Stop reading audio if user clicked to view next card
+  deckPos++;
+  if(deckPos >= currentDeck.length) {
+    toast("لقد أكملت مجموعة البطاقات الحالية! سنبدأ من جديد.");
+    deckPos = 0;
+  }
+  renderLearnStage();
+}
+
+function refreshDbFilters(){
+  if(!db) return;
+  const catSel = el('dbFilterCategory');
+  const cats = dbExec('SELECT DISTINCT main_category FROM cards ORDER BY main_category');
+  catSel.innerHTML = '<option value="all">كل التصنيفات</option>' +
+    cats.map(c=> `<option value="${escapeHtml(c.main_category)}">${escapeHtml(c.main_category)}</option>`).join('');
+
+  const books = dbExec('SELECT DISTINCT book_title FROM cards ORDER BY book_title');
+  const bookSel = el('dbFilterBook');
+  bookSel.innerHTML = '<option value="all">كل الكتب</option>' +
+    books.map(b=> `<option value="${escapeHtml(b.book_title)}">${escapeHtml(b.book_title)}</option>`).join('');
+}
+
+['dbFilterCategory','dbFilterBook','dbFilterStatus','viewModeSelect','groupBySelect'].forEach(id=>{
+  el(id).addEventListener('change', ()=>{ applyDbFilters(); });
+});
+let dbSearchDebounce;
+el('dbSearchInput').addEventListener('input', ()=>{
+  clearTimeout(dbSearchDebounce);
+  dbSearchDebounce = setTimeout(applyDbFilters, 220);
+});
+
+function applyDbFilters(){
+  stopSpeech();
+  if(!db){ dbDeck = []; renderDbContent(); return; }
+  const cat = el('dbFilterCategory').value;
+  const book = el('dbFilterBook').value;
+  const status = el('dbFilterStatus').value;
+  const search = el('dbSearchInput').value.trim();
+  
+  dbViewMode = el('viewModeSelect').value;
+  if(dbViewMode !== 'single') dbPageSize = parseInt(dbViewMode);
+  
+  dbGroupBy = el('groupBySelect').value;
+
+  let sql = `SELECT c.id FROM cards c JOIN progress p ON p.card_id = c.id WHERE 1=1`;
+  const params = [];
+  if(cat !== 'all'){ sql += ' AND c.main_category = ?'; params.push(cat); }
+  if(book !== 'all'){ sql += ' AND c.book_title = ?'; params.push(book); }
+  if(status !== 'all'){ sql += ' AND p.status = ?'; params.push(status); }
+  if(search){
+    sql += ' AND (c.headline LIKE ? OR c.takeaway LIKE ? OR c.topic LIKE ? OR c.actionable_insight LIKE ?)';
+    const like = `%${search}%`;
+    params.push(like, like, like, like);
+  }
+  
+  if(dbGroupBy === 'main_category') sql += ' ORDER BY c.main_category ASC, c.id ASC';
+  else if(dbGroupBy === 'book_title') sql += ' ORDER BY c.book_title ASC, c.id ASC';
+  else sql += ' ORDER BY c.id DESC';
+
+  const rows = dbExec(sql, params);
+  dbDeck = rows.map(r=> r.id);
+  dbLoadedCount = 0;
+  dbSinglePos = 0;
+  
+  el('dbResultCount').textContent = dbDeck.length;
+  
+  el('dbContent').innerHTML = ''; 
+  if(dbViewMode === 'single') renderDbSingle();
+  else renderDbGrid(false);
+}
+
+function getCardHTML(card, asTile=true){
+  const selCls = selectedIds.has(card.id) ? 'selected' : '';
+  const statusClass = card.status;
+  const statusLbl = STATUS_LABELS[card.status] || card.status;
+  
+  if(asTile){
+    return `
+      <div class="tile ${selCls}" data-id="${card.id}">
+        <div class="tile-check">✓</div>
+        <div class="tile-badges">
+          <span class="tile-badge status ${statusClass}">${escapeHtml(statusLbl)}</span>
+          <span class="tile-badge">${escapeHtml(card.main_category)}</span>
+        </div>
+        <h4>${escapeHtml(card.headline)}</h4>
+        <p class="snip">${escapeHtml(card.takeaway)}</p>
+        <div class="tile-actions">
+          <button onclick="event.stopPropagation(); openCardModal(${card.id});">✏️ تعديل</button>
+          <button class="del" onclick="event.stopPropagation(); deleteCard(${card.id});">🗑 حذف</button>
+        </div>
+      </div>
+    `;
+  } else {
+    return `
+      <div class="lcard" style="margin:0 auto; display:block;">
+        <button class="tts-btn" onclick="toggleReadCard(this, ${card.id})" title="استمع للبطاقة" data-playing="false">🔊</button>
+        <div class="badges">
+          <span class="badge cat">${escapeHtml(card.main_category)}</span>
+          <span class="badge book">📚 ${escapeHtml(card.book_title)}</span>
+          <span class="badge status ${statusClass}">${escapeHtml(statusLbl)}</span>
+        </div>
+        <div class="topic">${escapeHtml(card.topic)}</div>
+        <h3 class="headline">${escapeHtml(card.headline)}</h3>
+        <p class="takeaway">${escapeHtml(card.takeaway)}</p>
+        <div class="insight-box">
+          <span class="lbl">💡 نصيحة قابلة للتطبيق</span>
+          <p>${escapeHtml(card.actionable_insight)}</p>
+        </div>
+        <div class="card-actions" style="margin-top:16px;">
+          <button class="act-btn" style="border: 1px solid var(--line)" onclick="openCardModal(${card.id})">✏️ تعديل البطاقة</button>
+          <button class="act-btn" style="border: 1px solid var(--rose); color:var(--rose);" onclick="deleteCard(${card.id})">🗑 حذف البطاقة</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function renderDbGrid(append=false){
+  el('loadMoreWrap').style.display = 'none';
+  el('singleNavWrap').style.display = 'none';
+  
+  if(!dbDeck.length){
+    if(!append) el('dbContent').innerHTML = '<div class="empty-state">لا توجد بطاقات مطابقة</div>';
+    return;
+  }
+  
+  let container = el('dbContent');
+  let gridWrap = qs('.grid-wrap', container);
+  if(!append || !gridWrap || dbGroupBy !== 'none'){
+    if(!append) container.innerHTML = '';
+  }
+
+  let html = '';
+  const limit = Math.min(dbLoadedCount + dbPageSize, dbDeck.length);
+  
+  if(dbGroupBy !== 'none') {
+    html = renderGroupedSlice(0, limit);
+  } else {
+    if(!append) html += '<div class="grid-wrap">';
+    for(let i=dbLoadedCount; i<limit; i++){
+      const c = getCardById(dbDeck[i]);
+      if(c) html += getCardHTML(c, true);
+    }
+    if(!append) html += '</div>';
+  }
+  
+  if(append) {
+    if(dbGroupBy === 'none' && gridWrap) gridWrap.insertAdjacentHTML('beforeend', html);
+    else container.innerHTML = html; 
+  } else {
+    container.innerHTML = html;
+  }
+  
+  dbLoadedCount = limit;
+  if(dbLoadedCount < dbDeck.length){
+    el('loadMoreWrap').style.display = 'block';
+  }
+  bindTileEvents();
+}
+
+function renderGroupedSlice(start, end){
+  let result = '';
+  let currentGroup = null;
+  let activeGrid = false;
+  
+  for(let i=0; i<end; i++){
+    const c = getCardById(dbDeck[i]);
+    if(!c) continue;
+    const gVal = c[dbGroupBy];
+    
+    if(gVal !== currentGroup){
+      if(activeGrid) result += '</div>';
+      result += `<div class="group-heading">${escapeHtml(gVal)}</div><div class="grid-wrap">`;
+      currentGroup = gVal;
+      activeGrid = true;
+    }
+    result += getCardHTML(c, true);
+  }
+  if(activeGrid) result += '</div>';
+  return result;
+}
+
+function renderDbSingle(){
+  el('loadMoreWrap').style.display = 'none';
+  
+  if(!dbDeck.length){
+    el('dbContent').innerHTML = '<div class="empty-state">لا توجد بطاقات مطابقة</div>';
+    el('singleNavWrap').style.display = 'none';
+    return;
+  }
+  
+  const c = getCardById(dbDeck[dbSinglePos]);
+  el('dbContent').innerHTML = getCardHTML(c, false);
+  
+  el('singleNavWrap').style.display = 'flex';
+  el('singlePosLabel').textContent = `${dbSinglePos + 1} من ${dbDeck.length}`;
+  el('singlePrevBtn').disabled = (dbSinglePos === 0);
+  el('singleNextBtn').disabled = (dbSinglePos === dbDeck.length - 1);
+}
+
+el('singlePrevBtn').addEventListener('click', ()=>{ if(dbSinglePos > 0){ stopSpeech(); dbSinglePos--; renderDbSingle(); } });
+el('singleNextBtn').addEventListener('click', ()=>{ if(dbSinglePos < dbDeck.length-1){ stopSpeech(); dbSinglePos++; renderDbSingle(); } });
+el('loadMoreBtn').addEventListener('click', ()=>{ renderDbGrid(true); });
+
+const loadMoreObserver = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting && el('loadMoreWrap').style.display === 'block') {
+        el('loadMoreBtn').click();
+    }
+}, { threshold: 0.1 });
+loadMoreObserver.observe(el('loadMoreBtn'));
+
+function bindTileEvents(){
+  qsa('.tile:not(.learn-tile)').forEach(t=>{
+    t.removeEventListener('click', tileClick);
+    t.addEventListener('click', tileClick);
+  });
+}
+function tileClick(e){
+  if(e.target.tagName==='BUTTON' || !selectMode) return;
+  const id = parseInt(this.dataset.id);
+  if(selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  this.classList.toggle('selected', selectedIds.has(id));
+  updateSelectBar();
+}
+
+el('selectModeBtn').addEventListener('click', ()=>{
+  selectMode = !selectMode;
+  el('selectModeBtn').classList.toggle('active', selectMode);
+  if(!selectMode) exitSelectMode();
+  else{ el('selectBar').classList.add('show'); updateSelectBar(); }
+});
+function exitSelectMode(){
+  selectMode = false;
+  selectedIds.clear();
+  el('selectBar').classList.remove('show');
+  qsa('.tile.selected').forEach(t=> t.classList.remove('selected'));
+  el('selectModeBtn').classList.remove('active');
+}
+function updateSelectBar(){ el('selCount').textContent = selectedIds.size; }
+
+el('selAllBtn').addEventListener('click', ()=>{
+  qsa('.tile:not(.learn-tile)').forEach(t=>{
+    const id = parseInt(t.dataset.id);
+    selectedIds.add(id);
+    t.classList.add('selected');
+  });
+  updateSelectBar();
+});
+el('selNoneBtn').addEventListener('click', ()=>{
+  qsa('.tile:not(.learn-tile)').forEach(t=>{
+    const id = parseInt(t.dataset.id);
+    selectedIds.delete(id);
+    t.classList.remove('selected');
+  });
+  updateSelectBar();
+});
+
+async function deleteCard(id){
+  if(!confirm('هل أنت متأكد من حذف هذه البطاقة؟')) return;
+  dbRun('DELETE FROM progress WHERE card_id=?', [id]);
+  dbRun('DELETE FROM cards WHERE id=?', [id]);
+  persist();
+  applyDbFilters();
+  toast('تم حذف البطاقة');
+}
+el('selDeleteBtn').addEventListener('click', ()=>{
+  if(selectedIds.size===0 || !confirm(`حذف ${selectedIds.size} بطاقة؟`)) return;
+  const ids = Array.from(selectedIds);
+  db.run('BEGIN TRANSACTION');
+  ids.forEach(id=>{
+    dbRun('DELETE FROM progress WHERE card_id=?', [id]);
+    dbRun('DELETE FROM cards WHERE id=?', [id]);
+  });
+  db.run('COMMIT');
+  persist();
+  exitSelectMode();
+  applyDbFilters();
+  toast('تم الحذف بنجاح');
+});
+
+
+function refreshPdfScopeOptions(){
+  if(!db) return;
+  const sel = el('pdfScopeSelect');
+  const valSel = el('pdfScopeValue');
+  
+  sel.onchange = ()=>{
+    if(sel.value === 'all') valSel.style.display='none';
+    else {
+      valSel.style.display='inline-block';
+      valSel.innerHTML = '';
+      const col = sel.value === 'category' ? 'main_category' : 'book_title';
+      const items = dbExec(`SELECT DISTINCT ${col} as txt FROM cards ORDER BY txt`);
+      valSel.innerHTML = items.map(i=> `<option value="${escapeHtml(i.txt)}">${escapeHtml(i.txt)}</option>`).join('');
+    }
+  };
+  sel.onchange();
+}
+
+el('pdfExportScopeBtn').addEventListener('click', ()=>{
+  closeModal('settingsModalBackdrop');
+  if(!db) return;
+  const scope = el('pdfScopeSelect').value;
+  const val = el('pdfScopeValue').value;
+  let sql = `SELECT c.*, p.status FROM cards c JOIN progress p ON p.card_id=c.id`;
+  let params = [];
+  if(scope === 'category'){ sql += ' WHERE c.main_category=?'; params.push(val); }
+  else if(scope === 'book'){ sql += ' WHERE c.book_title=?'; params.push(val); }
+  
+  const cards = dbExec(sql, params);
+  doPdfPrint(cards);
+});
+
+el('selExportPdfBtn').addEventListener('click', ()=>{
+  if(selectedIds.size===0){ toast('لم يتم تحديد شيء'); return; }
+  const ids = Array.from(selectedIds);
+  const cards = ids.map(id=> getCardById(id));
+  doPdfPrint(cards);
+  exitSelectMode();
+});
+
+function doPdfPrint(cards){
+  const wrap = el('printArea');
+  if(cards.length === 0){ toast('لا توجد بطاقات للتصدير'); return; }
+  
+  let html = '';
+  for(const c of cards){
+    html += `
+      <div class="print-card">
+        <div class="p-badges">📚 ${escapeHtml(c.book_title)} | 🏷 ${escapeHtml(c.main_category)}</div>
+        <h2>${escapeHtml(c.headline)}</h2>
+        <div class="p-topic">${escapeHtml(c.topic)}</div>
+        <div class="p-take">${escapeHtml(c.takeaway)}</div>
+        <div class="p-insight">
+          <b>خطوة عملية:</b>
+          ${escapeHtml(c.actionable_insight)}
+        </div>
+      </div>
+    `;
+  }
+  wrap.innerHTML = html;
+  window.print();
+}
+
+// JSON Export function that seamlessly generates a JSON array matching the import schema
+function exportAllToJson() {
+  if(!db) return;
+  
+  // We ONLY fetch the exact columns required for importing, skipping internal IDs and progress statuses.
+  const rows = dbExec('SELECT book_title, main_category, topic, headline, takeaway, actionable_insight FROM cards');
+  
+  if(rows.length === 0) { 
+      toast('لا توجد بطاقات لتصديرها'); 
+      return; 
+  }
+  
+  const blob = new Blob([JSON.stringify(rows, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `irtiqa_cards_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+el('exportJsonBtn').addEventListener('click', exportAllToJson);
+el('dbExportJsonBtn').addEventListener('click', exportAllToJson);
+
+el('exportDbBtn').addEventListener('click', ()=>{
+  if(!db) return;
+  const data = db.export();
+  const blob = new Blob([data], {type: 'application/octet-stream'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `irtiqa_db_${new Date().toISOString().slice(0,10)}.sqlite`;
+  a.click();
+});
+
+el('loadDbBtn').addEventListener('click', ()=> el('dbFileInput').click());
+el('dbFileInput').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    const bytes = new Uint8Array(reader.result);
+    db = new SQL.Database(bytes);
+    persist();
+    toast('✅ تم استعادة قاعدة البيانات');
+    closeModal('settingsModalBackdrop');
+    if(el('view-database').classList.contains('active')) applyDbFilters();
+    if(el('view-learn').classList.contains('active')) applyFilters();
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+el('resetBtn').addEventListener('click', async ()=>{
+  if(!confirm('تحذير: سيتم مسح كل شيء بشكل نهائي! هل أنت متأكد؟')) return;
+  localStorage.removeItem('irtiqa_db');
+  localStorage.removeItem('mirqat_db'); // Clear old reference too
+  db = null;
+  await initDb();
+  toast('تم تفريغ قاعدة البيانات');
+  closeModal('settingsModalBackdrop');
+  applyFilters();
+  applyDbFilters();
+});
+</script>
+</body>
+</html>
